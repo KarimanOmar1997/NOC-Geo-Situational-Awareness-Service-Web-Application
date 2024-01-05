@@ -916,11 +916,11 @@ console.log(layer);
 await layer.load();
 let layerView = await view.whenLayerView(layer);
 
-// prepare data for total accidents by time of day chart
+// prepare data for total Tickets by time of day chart
 let charts = [], hourData = [], hourLabels = [];
 
-// Accidents by time of day chart
-// run stats query to return total number of accidents by time of day
+// Tickets by time of day chart
+// run stats query to return total number of Tickets by time of day
 // stats results will be grouped by the time of day
 const hourResult = await runQuery("1=1", "extract(hour from sd_open_time)");
 for (let feature of hourResult.features) {
@@ -930,11 +930,11 @@ for (let feature of hourResult.features) {
   hourLabels.push(feature.attributes["EXPR_1"]);
 }
 
-// create a bar chart showing total number of accidents by time of day
+// create a bar chart showing total number of Tickets by time of day
 updateChart("chart-day", hourData, hourLabels, false, 50);
 
-// Accidents by time by months
-// run stats query to return total number of accidents by months
+// Tickets by time by months
+// run stats query to return total number of Tickets by months
 let monthData = [];
 let monthLabels = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 const monthResult = await runQuery("1=1", "extract(month from sd_open_time)");
@@ -943,24 +943,24 @@ for (let feature of monthResult.features) {
   monthData.push(feature.attributes["count"]);
 }
 
-// create a bar chart showing total number of accidents by months
+// create a bar chart showing total number of Tickets by months
 updateChart("chart-month", monthData, monthLabels, false, 50);
-// run stats query to return total number of accidents by week days
+// run stats query to return total number of Tickets by week days
 let weekData = [];
 // const weekResult = await runQuery("1=1", "DAY_WEEK");
 // for (let feature of weekResult.features) {
 //   weekData.push(feature.attributes["count"]);
 // }
 
-// Accidents by days of week
-// week day labels are used for the total number of accidents by week days
+// Tickets by days of week
+// week day labels are used for the total number of Tickets by week days
 const weekLabels = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-// create a bar chart showing total number of accidents by week days
+// create a bar chart showing total number of Tickets by week days
 updateChart("chart-week", weekData, weekLabels, false, 50);
 
 let SDStatusData = [], SDStatusLabels = [];
-// Accidents by time of day chart
-// run stats query to return total number of accidents by time of day
+// Tickets by time of day chart
+// run stats query to return total number of Tickets by time of day
 // stats results will be grouped by the time of day
 const SDStatusResult = await runQuery("1=1", "sd_status");
 for (let feature of SDStatusResult.features) {
@@ -969,13 +969,13 @@ for (let feature of SDStatusResult.features) {
   SDStatusLabels.push(feature.attributes["sd_status"]);
 }
 
-      // create a bar chart showing total number of accidents by time of day
+      // create a bar chart showing total number of Tickets by time of day
       updateChart("chart-SDStatus", SDStatusData, SDStatusLabels, false, 50);
 
 
       let SUBCATEGORYData = [], SUBCATEGORYLabels = [];
-      // Accidents by time of day chart
-      // run stats query to return total number of accidents by time of day
+      // Tickets by time of day chart
+      // run stats query to return total number of Tickets by time of day
       // stats results will be grouped by the time of day
       const SUBCATEGORYResult = await runQuery("1=1", "subcategory");
       for (let feature of SUBCATEGORYResult.features) {
@@ -984,14 +984,14 @@ for (let feature of SDStatusResult.features) {
         SUBCATEGORYLabels.push(feature.attributes["subcategory"]);
       }
 
-      // create a bar chart showing total number of accidents by time of day
+      // create a bar chart showing total number of Tickets by time of day
       updatePieChart("chart-subcategory", SUBCATEGORYData, SUBCATEGORYLabels, false, 50);
 
 
 let dayDistributionChart = updateChart("chart-day-distribution", [], hourLabels, true, 50);
 
 // this function is called 3 times when the app loads and generates
-// count stats for accidents 1. by time of day 2. by day of week and 3. by month
+// count stats for Tickets 1. by time of day 2. by day of week and 3. by month
 async function runQuery(where, groupStats) {
   // create a query object that honors the layer settings
   let query = layer.createQuery();
@@ -1013,10 +1013,10 @@ async function runQuery(where, groupStats) {
 // We use this info to toggle the clicked bar color
 let previouslySelectedBarIndex = null;
 
-// this function is called when user hover the mouse over accidents charts.
-// Accidents layer view feature effect will be updated to highlight features
+// this function is called when user hover the mouse over Tickets charts.
+// Tickets layer view feature effect will be updated to highlight features
 // that fall within the selected time, week day or month
-async function applyFilterToAccidentsData(event, chart) {
+async function applyFilterToTicketsData(event, chart) {
   const activePoints = chart.getElementsAtEvent(event);
   // user did not click on a bar. stop here.
   if (activePoints.length == 0) {
@@ -1055,31 +1055,31 @@ async function applyFilterToAccidentsData(event, chart) {
     }
     previouslySelectedBarIndex = idx;
     let where;
-    // apply effect to accidents happened during the selected hour
+    // apply effect to Tickets happened during the selected hour
     if (event.target.id == "chart-day") {
       const queryValue = label;
       where = `extract(hour from sd_open_time) = ${queryValue}`;
       console.log(where);
     } else if (event.target.id == "chart-month") {
-      // apply effect to accidents happened during the selected month
+      // apply effect to Tickets happened during the selected month
       const queryValue = monthLabels.indexOf(label) + 1;
       where = `extract(month from sd_open_time) = ${queryValue}`;
-      const title = "Accidents by days in " + label;
+      const title = "Tickets by days in " + label;
       dayDistributionStats(where, "extract(day from sd_open_time)", title);
     }else if (event.target.id == "chart-SDStatus") {
-      // apply effect to accidents happened during the selected month
+      // apply effect to Tickets happened during the selected month
       const queryValue = label;
       where = `sd_status = '${queryValue}'`;
     } else if (event.target.id == "chart-subcategory") {
-      // apply effect to accidents happened during the selected month
+      // apply effect to Tickets happened during the selected month
       const queryValue = label;
       where = `subcategory = '${queryValue}'`;
     }else if (event.target.id == "chart-week") {
-      // apply effect to accidents happened during the selected week day
+      // apply effect to Tickets happened during the selected week day
       const queryValue = weekLabels.indexOf(label) + 1;
       // where = `sd_open_time = ${queryValue}`;
       // where = `DAY_WEEK = ${queryValue}`;
-      // const title = "Accidents by hours on " + label;
+      // const title = "Tickets by hours on " + label;
       // dayDistributionStats(where, "extract(hour from sd_open_time)", title);
     }
     layerView.featureEffect = {
@@ -1113,7 +1113,7 @@ async function dayDistributionStats(where, groupStats, label) {
   dayDistributionChart.update();
 }
 
-// called from applyFilterToAccidentsData function to update the clicked bar color
+// called from applyFilterToTicketsData function to update the clicked bar color
 function changeBarColor(chart, index, color) {
   chart.data.datasets[0].backgroundColor[index] = color;
   chart.update();
@@ -1142,15 +1142,15 @@ chartChoiceControl?.addEventListener("calciteChipGroupSelect", (event) => {
     chartMonth.style.display = "none";
     switch (event.target.selectedItems[0].value) {
       case "day":
-        chartBlock.heading = "Total accidents by time of day";
+        chartBlock.heading = "Total Tickets by time of day";
         chartDay.style.display = "block";
         break;
       case "week":
-        chartBlock.heading = "Total accidents by day of week";
+        chartBlock.heading = "Total Tickets by day of week";
         chartWeek.style.display = "block";
         break;
       case "month":
-        chartBlock.heading = "Total accidents by month";
+        chartBlock.heading = "Total Tickets by month";
         chartMonth.style.display = "block";
       default:
     }
@@ -1158,7 +1158,7 @@ chartChoiceControl?.addEventListener("calciteChipGroupSelect", (event) => {
 );
 
 // this function is called when the app loads. It creates three charts showing
-// total accidents by time of day, by day of the week and months
+// total Tickets by time of day, by day of the week and months
 
 function updatePieChart(canvas, data, labels, remove, max) {
   const canvasElement = document.getElementById(canvas);
@@ -1203,7 +1203,7 @@ function updatePieChart(canvas, data, labels, remove, max) {
     // add mouse-move event listener on the charts so that we can display features
     // corresponding to the selected by on the chart
     canvasElement.addEventListener("click", async () => {
-      const data = await applyFilterToAccidentsData(event, chart);
+      const data = await applyFilterToTicketsData(event, chart);
     });
   }
 
@@ -1251,7 +1251,7 @@ function updateChart(canvas, data, labels, remove, max) {
               ];
             return (
               data.labels[tooltipItem.index] +
-              " - Total accidents: " +
+              " - Total Tickets: " +
               total
             );
           }
@@ -1264,7 +1264,7 @@ function updateChart(canvas, data, labels, remove, max) {
     // add mouse-move event listener on the charts so that we can display features
     // corresponding to the selected by on the chart
     canvasElement.addEventListener("click", async () => {
-      const data = await applyFilterToAccidentsData(event, chart);
+      const data = await applyFilterToTicketsData(event, chart);
     });
   }
 
