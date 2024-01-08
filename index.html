@@ -117,6 +117,9 @@
       calcite-chip-group {
         margin: 1rem auto .5rem;
       }
+      #controls {
+          width: 10rem;
+      }
 
         </style>
  
@@ -165,11 +168,15 @@
         <div id="applicationDiv">
         <calcite-shell class="tab-content" id="pills-tabContent">
             <calcite-shell-panel class="tab-pane fade show " role="tabpanel" aria-labelledby="pills-home-tab" tabindex="0" id="shell-panel" slot="panel-end" position="end"  width-scale="1">
-              <calcite-block style="min-width: 20rem;"
+              <calcite-block style="min-width: 30rem;"
               heading="SITE INFORMANTION"
               description=""
             ></calcite-block>
-              <calcite-panel id="panel" ></calcite-panel>
+              <calcite-panel id="panel1" >
+                <div class="p-3 accordion" id="Data_Container_By_Select" >
+
+                </div> 
+              </calcite-panel>
             </calcite-shell-panel>
             <calcite-shell-panel class="tab-pane fade show " role="tabpanel" aria-labelledby="pills-home-tab" tabindex="0"  id="shell-panel2" slot="panel-end" position="end"  width-scale="1">
               <calcite-block style="min-width: 30rem;"
@@ -182,7 +189,7 @@
                 <input id="SearchInput" class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
                 <button id="SearchBTN" class="btn btn-outline-success" type="submit">Search</button>
               </div>
-              <div class="p-3 accordion" id="Data_Container" >
+              <div class="p-3 accordion" id="Data_Container_By_Search" >
 
               </div> 
             </calcite-panel>
@@ -226,11 +233,11 @@
               <option value="Closed">Closed</option>
             </select>
           </div>
-          <div class="d-flex">
+          <div class="d-flex mt-3">
 
-              <calcite-shell content-behind class="custom-example-theme">
-                <calcite-shell-panel id="rightPanel" slot="panel-end" display-mode="float">
-                  <calcite-panel id="statsPanel" heading="SD OPEN_TIME" description="Explore Tickets data">
+              <calcite-shell content-behind class="custom-example-theme ">
+                <calcite-shell-panel id="rightPanel" slot="panel-end" class="shadow" style="height: 65vh!important;" display-mode="float">
+                  <calcite-panel id="statsPanel" heading="Note:" description="Click on the graph bars to highlight the data in the map.">
                     <calcite-chip-group id="type-chips" selection-mode="single-persist">
                       <calcite-chip appearance="outline-fill" selected value="day">Daily</calcite-chip>
                       <!-- <calcite-chip appearance="outline-fill" value="week">Weekly</calcite-chip> -->
@@ -244,42 +251,42 @@
                     <calcite-block open id="day-chart-block" heading="Click on the graph bar to see hourly chart" style="display:none">
                       <canvas class="canvas" id="chart-day-distribution" height="200" width="400"></canvas>
                     </calcite-block>
-                    <calcite-notice slot="footer" open width="full" icon>
+                    <!-- <calcite-notice slot="footer" open width="full" icon>
                       <span slot="title">Note</span>
                       <span slot="message">Click on the graph bars to highlight the data in the map</span>
-                    </calcite-notice>
+                    </calcite-notice> -->
                   </calcite-panel>
                 </calcite-shell-panel>
             </calcite-shell>
 
             <calcite-shell content-behind class="custom-example-theme">
-              <calcite-shell-panel id="rightPanel" slot="panel-end" display-mode="float">
-                <calcite-panel id="statsPanel" heading="HPMS Tickets SD Status" description="Explore Tickets data">
+              <calcite-shell-panel id="rightPanel" slot="panel-end" style="height: 65vh!important;" display-mode="float" class="shadow">
+                <calcite-panel id="statsPanel" heading="Note:" description="Click on the graph bars to highlight the data in the map.">
                   <calcite-chip-group id="type-chips" selection-mode="single-persist">
                   </calcite-chip-group>
                   <calcite-block open id="chart-block" heading="Total HPMS Tickets by SD Status">
                     <canvas class="canvas" id="chart-SDStatus" height="300" width="400"></canvas>
                   </calcite-block>
-                  <calcite-notice slot="footer" open width="full" icon>
+                  <!-- <calcite-notice slot="footer" open width="full" icon>
                     <span slot="title">Note</span>
                     <span slot="message">Click on the graph bars to highlight the data in the map</span>
-                  </calcite-notice>
+                  </calcite-notice> -->
                 </calcite-panel>
               </calcite-shell-panel>
           </calcite-shell>
 
             <calcite-shell content-behind class="custom-example-theme">
-              <calcite-shell-panel id="rightPanel" slot="panel-end" display-mode="float">
-                <calcite-panel id="statsPanel" heading="Tickets Sub Category" description="Explore Tickets data">
+              <calcite-shell-panel id="rightPanel" slot="panel-end" display-mode="float" style="height: 65vh!important;" class="shadow">
+                <calcite-panel id="statsPanel" heading="Note:" description="Click on the graph bars to highlight the data in the map.">
                   <calcite-chip-group id="type-chips" selection-mode="single-persist">
                   </calcite-chip-group>
                   <calcite-block open id="chart-block" heading="Total Tickets by Sub Category">
                     <canvas class="canvas" id="chart-subcategory" height="290" width="400"></canvas>
                   </calcite-block>
-                  <calcite-notice slot="footer" open width="full" icon>
+                  <!-- <calcite-notice slot="footer" open width="full" icon>
                     <span slot="title">Note</span>
                     <span slot="message">Click on the graph bars to highlight the data in the map</span>
-                  </calcite-notice>
+                  </calcite-notice> -->
                 </calcite-panel>
               </calcite-shell-panel>
           </calcite-shell>

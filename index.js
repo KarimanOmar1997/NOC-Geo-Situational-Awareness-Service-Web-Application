@@ -84,6 +84,7 @@ map.layers.forEach(async (layer) => {
   layerBlock.id = layer.title;
   layerBlock.heading = layer.title;
   layerBlock.open = true;
+
   layerBlockArray.push(layerBlock);
   // Create an array of layerViews to be able to highlight selected features.
   if (layer.type === "feature") {
@@ -92,6 +93,87 @@ map.layers.forEach(async (layer) => {
   }
 });
 
+map.layers.getItemAt(8).popupTemplate= {
+  title: "{site_id}",
+  outFields: ["*"],
+  returnGeometry: true,
+  fieldInfos: [
+    {
+      fieldName: "site_id",
+      label: "Site ID:"
+    },
+    {
+      fieldName: "site_name",
+      label: "Site Name:"
+    },
+    {
+      fieldName: "total_no_customer",
+      label: "Total Customer:"
+    },
+    {
+      fieldName: "site_type",
+      label: "Site Type:"
+    }
+    ,
+    {
+      fieldName: "maintenance",
+      label: "Maintenance:"
+    },
+    {
+      fieldName: "outages",
+      label: "Outages:"
+    }
+    ,
+    {
+      fieldName: "latitude",
+      label: "Latitude:"
+    }
+    ,
+    {
+      fieldName: "longitude",
+      label: "Longitude:"
+    }
+  ],
+  content: [
+    // Add FieldContent to popup template.
+    {
+      type: "fields"
+    },
+    // Create RelationshipContent with the relationship between
+    // the units and fires.
+    {
+      type: "relationship",
+      // The numeric ID value for the defined relationship on the service.
+      // This can be found on the service.
+      relationshipId: 0,
+      description: "",
+      // Display two related fire features in the list of related features.
+      displayCount: 1,
+      title: "Maintenance Site Operation Data",
+      // Order the related features by the 'GIS_ACRES' in descending order.
+      orderByFields: {
+        field: "site_id",
+        order: "desc"
+      }
+    },
+    // // Create RelationshipContent with the relationship between
+    // // the units and wildfire protection facility statistics table.
+    {
+      type: "relationship",
+      relationshipId: 1,
+      description: "",
+      // Display only the one unit
+      displayCount: 1,
+      title: "Outages Data",
+      // Order list of related records by the 'NAME' field in ascending order.
+      orderByFields: {
+        field: "site_id",
+        order: "asc"
+      }
+    },
+  ]
+}
+
 // On view click, first remove all the previously added features (if any).
 reactiveUtils.on(
   () => view,
@@ -99,6 +181,7 @@ reactiveUtils.on(
   async (event) => {
     // Remove any existing highlighted features
     handles.removeAll();
+    document.getElementById("Data_Container_By_Select").innerHTML =" "
     layerBlockArray.forEach((block) => {
       while (block.lastElementChild) {
         block.removeChild(block.lastElementChild);
@@ -117,12 +200,18 @@ reactiveUtils.on(
         layerBlockArray.forEach((block) => {
           const layerTitle = graphic.layer.title;
           if (block.heading === layerTitle) {
-            panel.appendChild(block);
+            // panel.appendChild(block);
             const featureChild = new Feature({
               container: document.createElement("div"),
               graphic: graphic
             });
-            block.appendChild(featureChild.container);
+            if(block.id == "Network Coverage"){
+
+              console.log(featureChild.graphic.attributes.site_id);
+              getSitesFeatureLayer(featureChild.graphic.attributes.site_id , "select_on_map")
+              console.log(block);
+            }
+            // block.appendChild(featureChild.container);
             // If the graphic comes from a feature layer, add a highlight
             // to that feature using the layerView.highlight method.
             if (graphic.layer.type === "feature") {
@@ -161,17 +250,22 @@ reactiveUtils.on(
         view: view,
         expandIcon: "basemap",
         group: "top-left"
+      }),
+      new Expand({
+        content: controls,
+        view: view,
+        expandIcon: "filter",
+        group: "top-left"
       })
   ],
   "top-left"
   );
 
   view.ui.add("clear-selection", "top-left");
-  const test = new FeatureLayer({
-    url: "https://services3.arcgis.com/N0l9vjYH8GLn5HZh/arcgis/rest/services/Asia_Cell_V4/FeatureServer/2",
-  });
+
   document.getElementById("clear-selection").addEventListener("click", () => {
     handles.removeAll();
+    document.getElementById("Data_Container_By_Select").innerHTML =" "
     layerBlockArray.forEach((block) => {
       while (block.lastElementChild) {
         block.removeChild(block.lastElementChild);
@@ -179,163 +273,96 @@ reactiveUtils.on(
     });
    });
 
-  map.layers.getItemAt(3).popupTemplate = {
-  title: "{site_id}",
-  outFields: ["*"],
-  returnGeometry: true,
-  fieldInfos: [
-    {
-      fieldName: "site_id",
-      label: "site id"
-    },
-    {
-      fieldName: "site_name",
-      label: "site name"
-    }
-  ],
-  content: [
-    // Add FieldContent to popup template.
-    {
-      type: "fields"
-    },
-    // Create RelationshipContent with the relationship between
-    // the units and fires.
-    {
-      type: "relationship",
-      // The numeric ID value for the defined relationship on the service.
-      // This can be found on the service.
-      relationshipId: 2,
-      description: "Fires that {site_id} responded to from 2017-2021 ordered by most to least acreage burned.",
-      // Display two related fire features in the list of related features.
-      displayCount: 1,
-      title: "site",
-      // Order the related features by the 'GIS_ACRES' in descending order.
-      orderByFields: {
-        field: "site_id",
-        order: "desc"
-      }
-    },
-    // // Create RelationshipContent with the relationship between
-    // // the units and wildfire protection facility statistics table.
-    {
-      type: "relationship",
-      relationshipId: 2,
-      description: "Statistics on the facilities for wildland fire protection that reside within {UNIT}.",
-      // Display only the one unit
-      displayCount: 1,
-      title: "Unit Facility Statistics",
-      // Order list of related records by the 'NAME' field in ascending order.
-      orderByFields: {
-        field: "site_id",
-        order: "asc"
-      }
-    },
-    // Create RelationshipContent with the relationship between
-    // the counties and wildfire protection facilities.
-    {
-      type: "relationship",
-      relationshipId: 2,
-      description: "All facilities for wild land fire protection that reside in {UNIT}.",
-      // Display only two related cities.
-      displayCount: 1,
-      title: "Facilities for Wildland Fire Protection",
-      // Order list of related records by the 'NAME' field in ascending order.
-      orderByFields: {
-        field: "site_id",
-        order: "asc"
-      }
-    }
-  ]
-}   
-const featureLayerSites = new FeatureLayer({
-url:
-  "https://services3.arcgis.com/N0l9vjYH8GLn5HZh/arcgis/rest/services/Asia_Cell_V4/FeatureServer",
-  popupTemplate: {
-  title: "{site_id}",
-  outFields: ["*"],
-  returnGeometry: true,
-  fieldInfos: [
-    {
-      fieldName: "site_id",
-      label: "site id"
-    },
-    {
-      fieldName: "site_name",
-      label: "site name"
-    }
-  ],
-  content: [
-    // Add FieldContent to popup template.
-    {
-      type: "fields"
-    },
-    // Create RelationshipContent with the relationship between
-    // the units and fires.
-    {
-      type: "relationship",
-      // The numeric ID value for the defined relationship on the service.
-      // This can be found on the service.
-      relationshipId: 2,
-      description: "Fires that {site_id} responded to from 2017-2021 ordered by most to least acreage burned.",
-      // Display two related fire features in the list of related features.
-      displayCount: 1,
-      title: "site",
-      // Order the related features by the 'GIS_ACRES' in descending order.
-      orderByFields: {
-        field: "site_id",
-        order: "desc"
-      }
-    },
-    // // Create RelationshipContent with the relationship between
-    // // the units and wildfire protection facility statistics table.
-    {
-      type: "relationship",
-      relationshipId: 3,
-      description: "Statistics on the facilities for wildland fire protection that reside within {UNIT}.",
-      // Display only the one unit
-      displayCount: 1,
-      title: "Unit Facility Statistics",
-      // Order list of related records by the 'NAME' field in ascending order.
-      orderByFields: {
-        field: "site_id",
-        order: "asc"
-      }
-    },
-    // Create RelationshipContent with the relationship between
-    // the counties and wildfire protection facilities.
-    {
-      type: "relationship",
-      relationshipId: 1,
-      description: "All facilities for wild land fire protection that reside in {UNIT}.",
-      // Display only two related cities.
-      displayCount: 1,
-      title: "Facilities for Wildland Fire Protection",
-      // Order list of related records by the 'NAME' field in ascending order.
-      orderByFields: {
-        field: "site_id",
-        order: "asc"
-      }
-    }
-  ]
-},
-});
+ 
+// const featureLayerSites = new FeatureLayer({
+// url:
+//   "https://services3.arcgis.com/N0l9vjYH8GLn5HZh/arcgis/rest/services/Asia_Cell_V4/FeatureServer",
+//   popupTemplate: {
+//   title: "{site_id}",
+//   outFields: ["*"],
+//   returnGeometry: true,
+//   fieldInfos: [
+//     {
+//       fieldName: "site_id",
+//       label: "site id"
+//     },
+//     {
+//       fieldName: "site_name",
+//       label: "site name"
+//     }
+//   ],
+//   content: [
+//     // Add FieldContent to popup template.
+//     {
+//       type: "fields"
+//     },
+//     // Create RelationshipContent with the relationship between
+//     // the units and fires.
+//     {
+//       type: "relationship",
+//       // The numeric ID value for the defined relationship on the service.
+//       // This can be found on the service.
+//       relationshipId: 2,
+//       description: "Fires that {site_id} responded to from 2017-2021 ordered by most to least acreage burned.",
+//       // Display two related fire features in the list of related features.
+//       displayCount: 1,
+//       title: "site",
+//       // Order the related features by the 'GIS_ACRES' in descending order.
+//       orderByFields: {
+//         field: "site_id",
+//         order: "desc"
+//       }
+//     },
+//     // // Create RelationshipContent with the relationship between
+//     // // the units and wildfire protection facility statistics table.
+//     {
+//       type: "relationship",
+//       relationshipId: 3,
+//       description: "Statistics on the facilities for wildland fire protection that reside within {UNIT}.",
+//       // Display only the one unit
+//       displayCount: 1,
+//       title: "Unit Facility Statistics",
+//       // Order list of related records by the 'NAME' field in ascending order.
+//       orderByFields: {
+//         field: "site_id",
+//         order: "asc"
+//       }
+//     },
+//     // Create RelationshipContent with the relationship between
+//     // the counties and wildfire protection facilities.
+//     {
+//       type: "relationship",
+//       relationshipId: 1,
+//       description: "All facilities for wild land fire protection that reside in {UNIT}.",
+//       // Display only two related cities.
+//       displayCount: 1,
+//       title: "Facilities for Wildland Fire Protection",
+//       // Order list of related records by the 'NAME' field in ascending order.
+//       orderByFields: {
+//         field: "site_id",
+//         order: "asc"
+//       }
+//     }
+//   ]
+// },
+// });
 
-const featureLayerComplaints = new FeatureLayer({
-url: "https://services3.arcgis.com/N0l9vjYH8GLn5HZh/arcgis/rest/services/Asia_Cell_layer_493b7/FeatureServer",
-popupTemplate: {
-  // autocasts as new PopupTemplate()
-  // title: "<a href={Web_Page} target='_blank'> {Name}</a>, ({Party}-{State}) ",
-  title: "Mobile Number {comp_mobile}",
-  overwriteActions: false
-}
-});
+// const featureLayerComplaints = new FeatureLayer({
+// url: "https://services3.arcgis.com/N0l9vjYH8GLn5HZh/arcgis/rest/services/Asia_Cell_layer_493b7/FeatureServer",
+// popupTemplate: {
+//   // autocasts as new PopupTemplate()
+//   // title: "<a href={Web_Page} target='_blank'> {Name}</a>, ({Party}-{State}) ",
+//   title: "Mobile Number {comp_mobile}",
+//   overwriteActions: false
+// }
+// });
 const searchWidget = new Search({
 view: view,
-allPlaceholder: "sites or Senator",
+allPlaceholder: "site ID",
 includeDefaultSources: false,
 sources: [
   {
-    layer: map.layers.getItemAt(3) ,
+    layer: map.layers.getItemAt(8) ,
     searchFields: ["site_id"],
     displayField: "site_id",
     exactMatch: false,
@@ -343,23 +370,23 @@ sources: [
     name: "Sites",
     placeholder: "example: BAG0400"
   },
-  {
-    layer: featureLayerComplaints,
-    searchFields: ["comp_mobile"],
-    // searchFields: ["comp_mobile", "Party"],
-    suggestionTemplate: "{Name}, Party: {Party}",
-    exactMatch: false,
-    outFields: ["*"],
-    placeholder: "example: 011236565434",
-    name: "Senators",
-    zoomScale: 500000,
-    resultSymbol: {
-      type: "picture-marker", // autocasts as new PictureMarkerSymbol()
-      url: "https://developers.arcgis.com/javascript/latest/sample-code/widgets-search-multiplesource/live/images/senate.png",
-      height: 36,
-      width: 36
-    }
-  },
+  // {
+  //   layer: featureLayerComplaints,
+  //   searchFields: ["comp_mobile"],
+  //   // searchFields: ["comp_mobile", "Party"],
+  //   suggestionTemplate: "{Name}, Party: {Party}",
+  //   exactMatch: false,
+  //   outFields: ["*"],
+  //   placeholder: "example: 011236565434",
+  //   name: "Senators",
+  //   zoomScale: 500000,
+  //   resultSymbol: {
+  //     type: "picture-marker", // autocasts as new PictureMarkerSymbol()
+  //     url: "https://developers.arcgis.com/javascript/latest/sample-code/widgets-search-multiplesource/live/images/senate.png",
+  //     height: 36,
+  //     width: 36
+  //   }
+  // },
   {
     name: "ArcGIS World Geocoding Service",
     placeholder: "example: Nuuk, GRL",
@@ -507,7 +534,6 @@ view.ui.add(compassWidget, "top-right");
 
 
 const typeSelect = document.getElementById("type-select");
-view.ui.add("controls", "bottom-left");
 
 typeSelect.addEventListener("change", async() => {
   const value = typeSelect.value;
@@ -530,7 +556,7 @@ typeSelect.addEventListener("change", async() => {
 document.getElementById("SearchBTN").addEventListener("click", searchOnMap);
 function searchOnMap(){
 var addressVar = document.getElementById("SearchInput").value
-console.log(addressVar);
+// console.log(addressVar);
 const geocodingServiceUrl = "https://geocode-api.arcgis.com/arcgis/rest/services/World/GeocodeServer";
 
 const params = {
@@ -548,9 +574,9 @@ showResult(results);
 function showResult(results) {
 if (results.length) {
   var query = results[0];
-  console.log(query);
+  // console.log(query);
   const result = results[0];
-  console.log(result.location.longitude.toFixed(5) + "," + result.location.latitude.toFixed(5))
+  // console.log(result.location.longitude.toFixed(5) + "," + result.location.latitude.toFixed(5))
   view.graphics.add(new Graphic({
       symbol: {
         type: "simple-marker",
@@ -606,11 +632,11 @@ SitesFeatureLayer.queryFeatures(query).then(function(result){
     if (result.features.length > 0) {
         var polygon = result.features[result.features.length-1]; // Assuming you want the first polygon if there are multiple intersections
         // Do something with the polygon, e.g., access attributes: polygon.attributes
-        console.log(polygon.attributes.site_id);
-        getSitesFeatureLayer(polygon.attributes.site_id)
+        // console.log(polygon.attributes.site_id);
+        getSitesFeatureLayer(polygon.attributes.site_id , "search")
       } else {
-        console.log("Point is not within any polygon.");
-        document.getElementById("Data_Container").innerHTML =` `
+        // console.log("Point is not within any polygon.");
+        document.getElementById(caller == "search"?"Data_Container_By_Search":"Data_Container_By_Select").innerHTML =` `
     }
 }).catch(function(error){
     console.error("Error during query: ", error);
@@ -624,18 +650,22 @@ url: "https://services3.arcgis.com/N0l9vjYH8GLn5HZh/arcgis/rest/services/Asia_Ce
 });
 
 // Define the query parameters
-function getSitesFeatureLayer(site_id){
+function getSitesFeatureLayer(site_id , caller){
+
+  console.log(caller == "search"?"hi":"faa");
 
   var queryParams = {
     where: `site_id = '${site_id}'`, // Specify your query criteria
     outFields: ["*"] // Specify the fields you want to retrieve
   };
-  document.getElementById("Data_Container").innerHTML =` `
+  // document.getElementById(caller == "search"?"Data_Container_By_Search":"Data_Container_By_Select").innerHTML =` `
+  document.getElementById("Data_Container_By_Search").innerHTML =` `
+  document.getElementById("Data_Container_By_Select").innerHTML =` `
   // Execute the query
   SitesFeatureLayer.queryFeatures(queryParams)
     .then(function(result) {
       // Handle the query result
-      document.getElementById("Data_Container").innerHTML +=`
+      document.getElementById(caller == "search"?"Data_Container_By_Search":"Data_Container_By_Select").innerHTML +=`
       <div class="accordion-item">
       <h2 class="accordion-header" id="headingOne">
         <button class="accordion-button fw-bold text-success" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
@@ -643,7 +673,7 @@ function getSitesFeatureLayer(site_id){
         </button>
       </h2>
       <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
-        <div class="accordion-body" id="collapseOneBody">
+        <div class="accordion-body" id=${caller == "search"?"collapseOneBodySearch":"collapseOneBodySelect"}>
         </div>
       </div>
     </div>
@@ -651,7 +681,7 @@ function getSitesFeatureLayer(site_id){
      
       for (let index = 0; index < result.features.length; index++) {
         const element = result.features[index];
-        document.getElementById("collapseOneBody").innerHTML +=`
+        document.getElementById(caller == "search"?"collapseOneBodySearch":"collapseOneBodySelect").innerHTML +=`
         <table  class="mt-3 table table-striped table-bordered">
         <thead>
           <th colspan="2">Site ID: ${element.attributes.site_id?element.attributes.site_id:" "}</th>
@@ -689,7 +719,7 @@ function getSitesFeatureLayer(site_id){
       </tbody>
     </table>
       `
-        console.log("site",element.attributes);
+        // console.log("site",element.attributes);
       }
     })
     .catch(function(error) {
@@ -700,7 +730,7 @@ function getSitesFeatureLayer(site_id){
   MaintenanceSiteOperationFeatureLayer.queryFeatures(queryParams)
     .then(function(result) {
       // Handle the query result
-      document.getElementById("Data_Container").innerHTML +=`
+      document.getElementById(caller == "search"?"Data_Container_By_Search":"Data_Container_By_Select").innerHTML +=`
       <div class="accordion-item">
       <h2 class="accordion-header" id="headingTwo">
         <button class="accordion-button collapsed fw-bold text-success" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
@@ -708,7 +738,7 @@ function getSitesFeatureLayer(site_id){
         </button>
       </h2>
       <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#accordionExample">
-        <div class="accordion-body" id="collapseTwoBody">
+        <div class="accordion-body" id=${caller == "search"?"collapseTwoBodySearch":"collapseTwoBodySelect"}>
         </div>
       </div>
     </div>
@@ -717,7 +747,7 @@ function getSitesFeatureLayer(site_id){
       for (let index = 0; index < result.features.length; index++) {
         const element = result.features[index];
         var perationDateObj = new Date(element.attributes.peration_date)
-        document.getElementById("collapseTwoBody").innerHTML +=`
+        document.getElementById(caller == "search"?"collapseTwoBodySearch":"collapseTwoBodySelect").innerHTML +=`
         <table  class="mt-3 table table-striped table-bordered">
         <thead>
           <th colspan="2">Cell ID: ${element.attributes.cell_id?element.attributes.cell_id:" "}</th>
@@ -750,7 +780,7 @@ function getSitesFeatureLayer(site_id){
       </tbody>
     </table>
       `
-        console.log("MaintenanceSiteOperation",element.attributes);
+        // console.log("MaintenanceSiteOperation",element.attributes);
       }
     })
     .catch(function(error) {
@@ -762,7 +792,7 @@ function getSitesFeatureLayer(site_id){
   OutagesDataFeatureLayer.queryFeatures(queryParams)
     .then(function(result) {
       // Handle the query result
-      document.getElementById("Data_Container").innerHTML +=`
+      document.getElementById(caller == "search"?"Data_Container_By_Search":"Data_Container_By_Select").innerHTML +=`
       <div class="accordion-item">
       <h2 class="accordion-header" id="headingThree">
         <button class="accordion-button collapsed fw-bold text-success" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
@@ -770,7 +800,7 @@ function getSitesFeatureLayer(site_id){
         </button>
       </h2>
       <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#accordionExample">
-        <div class="accordion-body" id="collapseThreeBody">
+        <div class="accordion-body" id=${caller == "search"?"collapseThreeBodySearch":"collapseThreeBodySelect"}>
         </div>
       </div>
     </div>
@@ -779,7 +809,7 @@ function getSitesFeatureLayer(site_id){
         const element = result.features[index];
         var clearanceTimeDateObj = new Date(element.attributes.clearance_time);
         var closeTimeDateObj = new Date(element.attributes.close_time);
-        document.getElementById("collapseThreeBody").innerHTML +=`
+        document.getElementById(caller == "search"?"collapseThreeBodySearch":"collapseThreeBodySelect").innerHTML +=`
         <table  class="mt-3 table table-striped table-bordered">
         <thead>
           <th colspan="2">Incident ID: ${element.attributes.incident_id?element.attributes.incident_id:" "}</th>
@@ -900,7 +930,7 @@ function getSitesFeatureLayer(site_id){
       </tbody>
     </table>
       `
-      console.log("OutagesData",element.attributes);
+      // console.log("OutagesData",element.attributes);
       }
     })
     .catch(function(error) {
@@ -912,7 +942,7 @@ function getSitesFeatureLayer(site_id){
 // ========================================charts==============================================
 
 const layer = map.layers.getItemAt(7);
-console.log(layer);
+// console.log(layer);
 await layer.load();
 let layerView = await view.whenLayerView(layer);
 
@@ -925,7 +955,7 @@ let charts = [], hourData = [], hourLabels = [];
 const hourResult = await runQuery("1=1", "extract(hour from sd_open_time)");
 for (let feature of hourResult.features) {
   hourData.push(feature.attributes["count"]);
-  console.log(feature);
+  // console.log(feature);
   // hourLabels.push(feature.attributes["EXPR_1"]+2>12?(feature.attributes["EXPR_1"]+2)-12:feature.attributes["EXPR_1"]+2);
   hourLabels.push(feature.attributes["EXPR_1"]);
 }
@@ -939,7 +969,7 @@ let monthData = [];
 let monthLabels = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 const monthResult = await runQuery("1=1", "extract(month from sd_open_time)");
 for (let feature of monthResult.features) {
-  console.log(feature.attributes["count"]);
+  // console.log(feature.attributes["count"]);
   monthData.push(feature.attributes["count"]);
 }
 
@@ -965,7 +995,7 @@ let SDStatusData = [], SDStatusLabels = [];
 const SDStatusResult = await runQuery("1=1", "sd_status");
 for (let feature of SDStatusResult.features) {
   SDStatusData.push(feature.attributes["count"]);
-  console.log(feature.attributes);
+  // console.log(feature.attributes);
   SDStatusLabels.push(feature.attributes["sd_status"]);
 }
 
@@ -980,7 +1010,7 @@ for (let feature of SDStatusResult.features) {
       const SUBCATEGORYResult = await runQuery("1=1", "subcategory");
       for (let feature of SUBCATEGORYResult.features) {
         SUBCATEGORYData.push(feature.attributes["count"]);
-        console.log(feature.attributes);
+        // console.log(feature.attributes);
         SUBCATEGORYLabels.push(feature.attributes["subcategory"]);
       }
 
@@ -1028,7 +1058,8 @@ async function applyFilterToTicketsData(event, chart) {
   // There is a selected bar already. Clear up the previous selection before applying a new change
   if (previouslySelectedBarIndex >= 0) {
     // change the bar color back to blue
-    if (!event.target.id == "chart-subcategory"){
+    if (event.target.id != "chart-subcategory"){
+      // console.log('in',event.target.id);
 
       changeBarColor(chart, previouslySelectedBarIndex, "#007AC2");
     }
@@ -1049,8 +1080,9 @@ async function applyFilterToTicketsData(event, chart) {
   // feature effect will be applied based on the chart bar user clicked on
   if (activePoints[0]) {
     const label = chartData.labels[idx];
-    if (!event.target.id == "chart-subcategory"){
 
+    if (event.target.id != "chart-subcategory"){
+      // console.log('in if',event.target.id);
       changeBarColor(chart, idx, "red");
     }
     previouslySelectedBarIndex = idx;
@@ -1059,7 +1091,7 @@ async function applyFilterToTicketsData(event, chart) {
     if (event.target.id == "chart-day") {
       const queryValue = label;
       where = `extract(hour from sd_open_time) = ${queryValue}`;
-      console.log(where);
+      // console.log(where);
     } else if (event.target.id == "chart-month") {
       // apply effect to Tickets happened during the selected month
       const queryValue = monthLabels.indexOf(label) + 1;
