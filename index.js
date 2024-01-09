@@ -21,6 +21,7 @@ require([
   "esri/widgets/Locate",
   "esri/widgets/Print",
   "esri/widgets/Fullscreen",
+  "esri/widgets/FeatureTable"
 ],  (
   esriConfig,
   MapView,
@@ -43,7 +44,8 @@ require([
   Home,
   Locate,
   Print,
-  Fullscreen
+  Fullscreen, 
+  FeatureTable
 ) => {
   (async () => {
   let webmapId  = "f4f6642aa5514d83aae6de0ebb65057e";
@@ -61,7 +63,7 @@ require([
    const handles = new Handles();
     let layerBlockArray = [];
     let layerViews = [];
-    const panel = document.getElementById("panel");
+    const panel = document.getElementById("Data_Container_By_Select_all");
     const map = new WebMap({
     portalItem: {
       id: webmapId
@@ -92,7 +94,17 @@ map.layers.forEach(async (layer) => {
     layerViews.push(layerView);
   }
 });
-
+console.log("to get 0 :",map.layers.getItemAt(0).title);
+console.log("to get 1 :",map.layers.getItemAt(1).title);
+console.log("to get 2 :",map.layers.getItemAt(2).title);
+console.log("to get 3 :",map.layers.getItemAt(3).title);
+console.log("to get 4 :",map.layers.getItemAt(4).title);
+console.log("to get 5 :",map.layers.getItemAt(5).title);
+console.log("to get 6 :",map.layers.getItemAt(6).title);
+console.log("to get 7 :",map.layers.getItemAt(7).title);
+console.log("to get 8 :",map.layers.getItemAt(8).title);
+console.log("to get 9 :",map.layers.getItemAt(9).title);
+console.log("to get 10 :",map.layers.getItemAt(10).title);
 map.layers.getItemAt(8).popupTemplate= {
   title: "{site_id}",
   outFields: ["*"],
@@ -200,11 +212,12 @@ reactiveUtils.on(
         layerBlockArray.forEach((block) => {
           const layerTitle = graphic.layer.title;
           if (block.heading === layerTitle) {
-            // panel.appendChild(block);
+            panel.appendChild(block);
             const featureChild = new Feature({
               container: document.createElement("div"),
               graphic: graphic
             });
+            block.appendChild(featureChild.container);
             if(block.id == "Network Coverage"){
 
               console.log(featureChild.graphic.attributes.site_id);
@@ -273,89 +286,6 @@ reactiveUtils.on(
     });
    });
 
- 
-// const featureLayerSites = new FeatureLayer({
-// url:
-//   "https://services3.arcgis.com/N0l9vjYH8GLn5HZh/arcgis/rest/services/Asia_Cell_V4/FeatureServer",
-//   popupTemplate: {
-//   title: "{site_id}",
-//   outFields: ["*"],
-//   returnGeometry: true,
-//   fieldInfos: [
-//     {
-//       fieldName: "site_id",
-//       label: "site id"
-//     },
-//     {
-//       fieldName: "site_name",
-//       label: "site name"
-//     }
-//   ],
-//   content: [
-//     // Add FieldContent to popup template.
-//     {
-//       type: "fields"
-//     },
-//     // Create RelationshipContent with the relationship between
-//     // the units and fires.
-//     {
-//       type: "relationship",
-//       // The numeric ID value for the defined relationship on the service.
-//       // This can be found on the service.
-//       relationshipId: 2,
-//       description: "Fires that {site_id} responded to from 2017-2021 ordered by most to least acreage burned.",
-//       // Display two related fire features in the list of related features.
-//       displayCount: 1,
-//       title: "site",
-//       // Order the related features by the 'GIS_ACRES' in descending order.
-//       orderByFields: {
-//         field: "site_id",
-//         order: "desc"
-//       }
-//     },
-//     // // Create RelationshipContent with the relationship between
-//     // // the units and wildfire protection facility statistics table.
-//     {
-//       type: "relationship",
-//       relationshipId: 3,
-//       description: "Statistics on the facilities for wildland fire protection that reside within {UNIT}.",
-//       // Display only the one unit
-//       displayCount: 1,
-//       title: "Unit Facility Statistics",
-//       // Order list of related records by the 'NAME' field in ascending order.
-//       orderByFields: {
-//         field: "site_id",
-//         order: "asc"
-//       }
-//     },
-//     // Create RelationshipContent with the relationship between
-//     // the counties and wildfire protection facilities.
-//     {
-//       type: "relationship",
-//       relationshipId: 1,
-//       description: "All facilities for wild land fire protection that reside in {UNIT}.",
-//       // Display only two related cities.
-//       displayCount: 1,
-//       title: "Facilities for Wildland Fire Protection",
-//       // Order list of related records by the 'NAME' field in ascending order.
-//       orderByFields: {
-//         field: "site_id",
-//         order: "asc"
-//       }
-//     }
-//   ]
-// },
-// });
-
-// const featureLayerComplaints = new FeatureLayer({
-// url: "https://services3.arcgis.com/N0l9vjYH8GLn5HZh/arcgis/rest/services/Asia_Cell_layer_493b7/FeatureServer",
-// popupTemplate: {
-//   // autocasts as new PopupTemplate()
-//   // title: "<a href={Web_Page} target='_blank'> {Name}</a>, ({Party}-{State}) ",
-//   title: "Mobile Number {comp_mobile}",
-//   overwriteActions: false
-// }
-// });
 const searchWidget = new Search({
 view: view,
 allPlaceholder: "site ID",
@@ -370,23 +300,6 @@ sources: [
     name: "Sites",
     placeholder: "example: BAG0400"
   },
-  // {
-  //   layer: featureLayerComplaints,
-  //   searchFields: ["comp_mobile"],
-  //   // searchFields: ["comp_mobile", "Party"],
-  //   suggestionTemplate: "{Name}, Party: {Party}",
-  //   exactMatch: false,
-  //   outFields: ["*"],
-  //   placeholder: "example: 011236565434",
-  //   name: "Senators",
-  //   zoomScale: 500000,
-  //   resultSymbol: {
-  //     type: "picture-marker", // autocasts as new PictureMarkerSymbol()
-  //     url: "https://developers.arcgis.com/javascript/latest/sample-code/widgets-search-multiplesource/live/images/senate.png",
-  //     height: 36,
-  //     width: 36
-  //   }
-  // },
   {
     name: "ArcGIS World Geocoding Service",
     placeholder: "example: Nuuk, GRL",
@@ -615,19 +528,20 @@ if (results.length) {
 }
 };
 
-const SitesFeatureLayer = new FeatureLayer({
+const NetworkCoverageFeatureLayer = new FeatureLayer({
 url: "https://services3.arcgis.com/N0l9vjYH8GLn5HZh/arcgis/rest/services/Asia_Cell_V4/FeatureServer/2",
 });
 
+
 function getDitalls(point){
 
-var query = SitesFeatureLayer.createQuery();
+var query = NetworkCoverageFeatureLayer.createQuery();
 
 // Set the geometry for the query
 query.geometry = point;
 
 // Execute the query
-SitesFeatureLayer.queryFeatures(query).then(function(result){
+NetworkCoverageFeatureLayer.queryFeatures(query).then(function(result){
     // Check if any features were found
     if (result.features.length > 0) {
         var polygon = result.features[result.features.length-1]; // Assuming you want the first polygon if there are multiple intersections
@@ -636,7 +550,7 @@ SitesFeatureLayer.queryFeatures(query).then(function(result){
         getSitesFeatureLayer(polygon.attributes.site_id , "search")
       } else {
         // console.log("Point is not within any polygon.");
-        document.getElementById(caller == "search"?"Data_Container_By_Search":"Data_Container_By_Select").innerHTML =` `
+        document.getElementById("Data_Container_By_Search").innerHTML =`<h3 style="color:gray"> No Data Found </h3>`
     }
 }).catch(function(error){
     console.error("Error during query: ", error);
@@ -652,291 +566,311 @@ url: "https://services3.arcgis.com/N0l9vjYH8GLn5HZh/arcgis/rest/services/Asia_Ce
 // Define the query parameters
 function getSitesFeatureLayer(site_id , caller){
 
-  console.log(caller == "search"?"hi":"faa");
-
-  var queryParams = {
-    where: `site_id = '${site_id}'`, // Specify your query criteria
-    outFields: ["*"] // Specify the fields you want to retrieve
-  };
-  // document.getElementById(caller == "search"?"Data_Container_By_Search":"Data_Container_By_Select").innerHTML =` `
   document.getElementById("Data_Container_By_Search").innerHTML =` `
   document.getElementById("Data_Container_By_Select").innerHTML =` `
-  // Execute the query
-  SitesFeatureLayer.queryFeatures(queryParams)
-    .then(function(result) {
-      // Handle the query result
-      document.getElementById(caller == "search"?"Data_Container_By_Search":"Data_Container_By_Select").innerHTML +=`
-      <div class="accordion-item">
-      <h2 class="accordion-header" id="headingOne">
-        <button class="accordion-button fw-bold text-success" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-          Network Coverage Data
-        </button>
-      </h2>
-      <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
-        <div class="accordion-body" id=${caller == "search"?"collapseOneBodySearch":"collapseOneBodySelect"}>
-        </div>
-      </div>
-    </div>
-      `
-     
-      for (let index = 0; index < result.features.length; index++) {
-        const element = result.features[index];
-        document.getElementById(caller == "search"?"collapseOneBodySearch":"collapseOneBodySelect").innerHTML +=`
-        <table  class="mt-3 table table-striped table-bordered">
-        <thead>
-          <th colspan="2">Site ID: ${element.attributes.site_id?element.attributes.site_id:" "}</th>
-        </thead>
-      <tbody>
-        <tr>
-          <th>Coverage Status: </th>
-          <td> ${element.attributes.coverage_status?element.attributes.coverage_status:" "}</td>
-        </tr>
-        <tr>
-          <th>Coverage Status Date Time: </th>
-          <td> ${element.attributes.coverage_status_date_time?element.attributes.coverage_status_date_time:" "}</td>
-        </tr>
-        <tr>
-          <th>Coverage Location: </th>
-          <td> ${element.attributes.coverage_location?element.attributes.coverage_location:" "}</td>
-        </tr>
-        <tr>
-          <th>CGI: </th>
-          <td> ${element.attributes.cgi?element.attributes.cgi:" "}</td>
-        </tr>
-        <tr>
-          <th>Site Name: </th>
-          <td> ${element.attributes.site_name?element.attributes.site_name:" "}</td>
-        </tr>
-        <tr>
-          <th>Latitude: </th>
-          <td> ${element.attributes.latitude?element.attributes.latitude:" "}</td>
-        </tr>
-        <tr>
-          <th>Longitude: </th>
-          <td> ${element.attributes.longitude?element.attributes.longitude:" "}</td>
-        </tr>
+console.log("ffffff",site_id);
+    if(site_id){
 
-      </tbody>
-    </table>
-      `
-        // console.log("site",element.attributes);
-      }
-    })
-    .catch(function(error) {
-      // Handle errors
-      console.error("Error performing query:", error);
-    });
-  // Execute the query
-  MaintenanceSiteOperationFeatureLayer.queryFeatures(queryParams)
-    .then(function(result) {
-      // Handle the query result
-      document.getElementById(caller == "search"?"Data_Container_By_Search":"Data_Container_By_Select").innerHTML +=`
-      <div class="accordion-item">
-      <h2 class="accordion-header" id="headingTwo">
-        <button class="accordion-button collapsed fw-bold text-success" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
-          Maintenance Site Operation Data
-        </button>
-      </h2>
-      <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#accordionExample">
-        <div class="accordion-body" id=${caller == "search"?"collapseTwoBodySearch":"collapseTwoBodySelect"}>
-        </div>
-      </div>
-    </div>
-      `
-     
-      for (let index = 0; index < result.features.length; index++) {
-        const element = result.features[index];
-        var perationDateObj = new Date(element.attributes.peration_date)
-        document.getElementById(caller == "search"?"collapseTwoBodySearch":"collapseTwoBodySelect").innerHTML +=`
-        <table  class="mt-3 table table-striped table-bordered">
-        <thead>
-          <th colspan="2">Cell ID: ${element.attributes.cell_id?element.attributes.cell_id:" "}</th>
-        </thead>
-      <tbody>
-        <tr>
-          <th>Operation Category: </th>
-          <td> ${element.attributes.operation_category?element.attributes.operation_category:" "}</td>
-        </tr>
-        <tr>
-          <th>Operation ID: </th>
-          <td> ${element.attributes.operation_id?element.attributes.operation_id:" "}</td>
-        </tr>
-        <tr>
-          <th>Operation Name: </th>
-          <td> ${element.attributes.operation_name?element.attributes.operation_name:" "}</td>
-        </tr>
-        <tr>
-          <th>Peration Date: </th>
-          <td> ${perationDateObj?perationDateObj.toUTCString():" "}</td>
-        </tr>
-        <tr>
-          <th>Site ID: </th>
-          <td> ${element.attributes.site_id?element.attributes.site_id:" "}</td>
-        </tr>
-        <tr>
-          <th>Status: </th>
-          <td> ${element.attributes.status?element.attributes.status:" "}</td>
-        </tr>
-      </tbody>
-    </table>
-      `
-        // console.log("MaintenanceSiteOperation",element.attributes);
-      }
-    })
-    .catch(function(error) {
-      // Handle errors
-      console.error("Error performing query:", error);
-    });
+      var queryParams = {
+        where: `site_id = '${site_id}'`, // Specify your query criteria
+        outFields: ["*"] // Specify the fields you want to retrieve
+      };
+      // Execute the query
 
-  // Execute the query
-  OutagesDataFeatureLayer.queryFeatures(queryParams)
-    .then(function(result) {
-      // Handle the query result
-      document.getElementById(caller == "search"?"Data_Container_By_Search":"Data_Container_By_Select").innerHTML +=`
-      <div class="accordion-item">
-      <h2 class="accordion-header" id="headingThree">
-        <button class="accordion-button collapsed fw-bold text-success" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
-          Outages Data
-        </button>
-      </h2>
-      <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#accordionExample">
-        <div class="accordion-body" id=${caller == "search"?"collapseThreeBodySearch":"collapseThreeBodySelect"}>
+        
+        if (caller == "search") {
+          NetworkCoverageFeatureLayer.queryFeatures(queryParams)
+          .then(function(result) {
+            // Handle the query result
+            document.getElementById(caller == "search"?"Data_Container_By_Search":"Data_Container_By_Select").innerHTML +=`
+            <div class="accordion-item">
+            <h2 class="accordion-header" id="headingOne">
+              <button class="accordion-button fw-bold text-success" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                Network Coverage Data
+              </button>
+            </h2>
+            <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
+              <div class="accordion-body" id=${caller == "search"?"collapseOneBodySearch":"collapseOneBodySelect"}>
+              </div>
+            </div>
+          </div>
+            `
+           
+            for (let index = 0; index < result.features.length; index++) {
+              const element = result.features[index];
+              document.getElementById(caller == "search"?"collapseOneBodySearch":"collapseOneBodySelect").innerHTML +=`
+              <table  class="mt-3 table table-striped table-bordered">
+              <thead>
+                <th colspan="2">Site ID: ${element.attributes.site_id?element.attributes.site_id:" "}</th>
+              </thead>
+            <tbody>
+              <tr>
+                <th>Coverage Status: </th>
+                <td> ${element.attributes.coverage_status?element.attributes.coverage_status:" "}</td>
+              </tr>
+              <tr>
+                <th>Coverage Status Date Time: </th>
+                <td> ${element.attributes.coverage_status_date_time?element.attributes.coverage_status_date_time:" "}</td>
+              </tr>
+              <tr>
+                <th>Coverage Location: </th>
+                <td> ${element.attributes.coverage_location?element.attributes.coverage_location:" "}</td>
+              </tr>
+              <tr>
+                <th>CGI: </th>
+                <td> ${element.attributes.cgi?element.attributes.cgi:" "}</td>
+              </tr>
+              <tr>
+                <th>Site Name: </th>
+                <td> ${element.attributes.site_name?element.attributes.site_name:" "}</td>
+              </tr>
+              <tr>
+                <th>Latitude: </th>
+                <td> ${element.attributes.latitude?element.attributes.latitude:" "}</td>
+              </tr>
+              <tr>
+                <th>Longitude: </th>
+                <td> ${element.attributes.longitude?element.attributes.longitude:" "}</td>
+              </tr>
+      
+            </tbody>
+          </table>
+            `
+              // console.log("site",element.attributes);
+            }
+          })
+          .catch(function(error) {
+            // Handle errors
+            console.error("Error performing query:", error);
+          });
+        }
+
+
+      // Execute the query
+      // setTimeout(() => {
+      
+        MaintenanceSiteOperationFeatureLayer.queryFeatures(queryParams)
+          .then(function(result) {
+
+                          // Execute the query
+        OutagesDataFeatureLayer.queryFeatures(queryParams)
+        .then(function(result) {
+          // Handle the query result
+          document.getElementById(caller == "search"?"Data_Container_By_Search":"Data_Container_By_Select").innerHTML +=`
+          <div class="accordion-item">
+          <h2 class="accordion-header" id="headingThree">
+            <button class="accordion-button collapsed fw-bold text-success" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+              Outages Data
+            </button>
+          </h2>
+          <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#accordionExample">
+            <div class="accordion-body" id=${caller == "search"?"collapseThreeBodySearch":"collapseThreeBodySelect"}>
+            </div>
+          </div>
         </div>
-      </div>
-    </div>
-      `
-      for (let index = 0; index < result.features.length; index++) {
-        const element = result.features[index];
-        var clearanceTimeDateObj = new Date(element.attributes.clearance_time);
-        var closeTimeDateObj = new Date(element.attributes.close_time);
-        document.getElementById(caller == "search"?"collapseThreeBodySearch":"collapseThreeBodySelect").innerHTML +=`
-        <table  class="mt-3 table table-striped table-bordered">
-        <thead>
-          <th colspan="2">Incident ID: ${element.attributes.incident_id?element.attributes.incident_id:" "}</th>
-        </thead>
-      <tbody>
-        <tr>
-          <th>Affected Sector: </th>
-          <td> ${element.attributes.affected_sector?element.attributes.affected_sector:" "}</td>
-        </tr>
-        <tr>
-          <th>Affectedobject: </th>
-          <td> ${element.attributes.affectedobject?element.attributes.affectedobject:" "}</td>
-        </tr>
-        <tr>
-          <th>Alarm Number: </th>
-          <td> ${element.attributes.alarm_number?element.attributes.alarm_number:" "}</td>
-        </tr>
-        <tr>
-          <th>Alarm Severity: </th>
-          <td> ${element.attributes.alarm_severity?element.attributes.alarm_severity:" "}</td>
-        </tr>
-        <tr>
-          <th>Assignment: </th>
-          <td> ${element.attributes.assignment?element.attributes.assignment:" "}</td>
-        </tr>
-        <tr>
-          <th>Cell ID: </th>
-          <td> ${element.attributes.cell_id?element.attributes.cell_id:" "}</td>
-        </tr>
-        <tr>
-          <th>Clearance Time: </th>
-          <td> ${clearanceTimeDateObj?clearanceTimeDateObj.toUTCString():" "}</td>
-        </tr>
-        <tr>
-          <th>Close Time: </th>
-          <td> ${closeTimeDateObj?closeTimeDateObj.toUTCString():" "}</td>
-        </tr>
-        <tr>
-          <th>Cluster: </th>
-          <td> ${element.attributes.cluster?element.attributes.cluster:" "}</td>
-        </tr>
-        <tr>
-          <th>Duration: </th>
-          <td> ${element.attributes.duration?element.attributes.duration:" "}</td>
-        </tr>
-        <tr>
-          <th>Element: </th>
-          <td> ${element.attributes.element?element.attributes.element:" "}</td>
-        </tr>
-        <tr>
-          <th>Incident ID: </th>
-          <td> ${element.attributes.incident_id?element.attributes.incident_id:" "}</td>
-        </tr>
-        <tr>
-          <th>Kpi Category: </th>
-          <td> ${element.attributes.kpi_category?element.attributes.kpi_category:" "}</td>
-        </tr>
-        <tr>
-          <th>Kpi Subcategory: </th>
-          <td> ${element.attributes.kpi_subcategory?element.attributes.kpi_subcategory:" "}</td>
-        </tr>
-        <tr>
-          <th>NE Name: </th>
-          <td> ${element.attributes.ne_name?element.attributes.ne_name:" "}</td>
-        </tr>
-        <tr>
-          <th>Notification ID: </th>
-          <td> ${element.attributes.notification_id?element.attributes.notification_id:" "}</td>
-        </tr>
-        <tr>
-          <th>Open Time: </th>
-          <td> ${element.attributes.open_time?element.attributes.open_time:" "}</td>
-        </tr>
-        <tr>
-          <th>Original_event Time: </th>
-          <td> ${element.attributes.original_event_time?element.attributes.original_event_time:" "}</td>
-        </tr>
-        <tr>
-          <th>Problem Category: </th>
-          <td> ${element.attributes.problem_category?element.attributes.problem_category:" "}</td>
-        </tr>
-        <tr>
-          <th>Province City: </th>
-          <td> ${element.attributes.province_city?element.attributes.province_city:" "}</td>
-        </tr>
-        <tr>
-          <th>Reason: </th>
-          <td> ${element.attributes.reason?element.attributes.reason:" "}</td>
-        </tr>
-        <tr>
-          <th>Resolution: </th>
-          <td> ${element.attributes.resolution?element.attributes.resolution:" "}</td>
-        </tr>
-        <tr>
-          <th>Resolution Code: </th>
-          <td> ${element.attributes.resolution_code?element.attributes.resolution_code:" "}</td>
-        </tr>
-        <tr>
-          <th>Service Affected: </th>
-          <td> ${element.attributes.service_affected?element.attributes.service_affected:" "}</td>
-        </tr>
-        <tr>
-          <th>Site ID: </th>
-          <td> ${element.attributes.site_id?element.attributes.site_id:" "}</td>
-        </tr>
-        <tr>
-          <th>Site Name: </th>
-          <td> ${element.attributes.site_name?element.attributes.site_name:" "}</td>
-        </tr>
-        <tr>
-          <th>Status: </th>
-          <td> ${element.attributes.status?element.attributes.status:" "}</td>
-        </tr>
-        <tr>
-          <th>Update Time: </th>
-          <td> ${element.attributes.update_time?element.attributes.update_time:" "}</td>
-        </tr>
-      </tbody>
-    </table>
-      `
-      // console.log("OutagesData",element.attributes);
+          `
+          for (let index = 0; index < result.features.length; index++) {
+            const element = result.features[index];
+            var clearanceTimeDateObj = new Date(element.attributes.clearance_time);
+            var closeTimeDateObj = new Date(element.attributes.close_time);
+            document.getElementById(caller == "search"?"collapseThreeBodySearch":"collapseThreeBodySelect").innerHTML +=`
+            <table  class="mt-3 table table-striped table-bordered">
+            <thead>
+              <th colspan="2">Incident ID: ${element.attributes.incident_id?element.attributes.incident_id:" "}</th>
+            </thead>
+          <tbody>
+            <tr>
+              <th>Affected Sector: </th>
+              <td> ${element.attributes.affected_sector?element.attributes.affected_sector:" "}</td>
+            </tr>
+            <tr>
+              <th>Affectedobject: </th>
+              <td> ${element.attributes.affectedobject?element.attributes.affectedobject:" "}</td>
+            </tr>
+            <tr>
+              <th>Alarm Number: </th>
+              <td> ${element.attributes.alarm_number?element.attributes.alarm_number:" "}</td>
+            </tr>
+            <tr>
+              <th>Alarm Severity: </th>
+              <td> ${element.attributes.alarm_severity?element.attributes.alarm_severity:" "}</td>
+            </tr>
+            <tr>
+              <th>Assignment: </th>
+              <td> ${element.attributes.assignment?element.attributes.assignment:" "}</td>
+            </tr>
+            <tr>
+              <th>Cell ID: </th>
+              <td> ${element.attributes.cell_id?element.attributes.cell_id:" "}</td>
+            </tr>
+            <tr>
+              <th>Clearance Time: </th>
+              <td> ${clearanceTimeDateObj?clearanceTimeDateObj.toUTCString():" "}</td>
+            </tr>
+            <tr>
+              <th>Close Time: </th>
+              <td> ${closeTimeDateObj?closeTimeDateObj.toUTCString():" "}</td>
+            </tr>
+            <tr>
+              <th>Cluster: </th>
+              <td> ${element.attributes.cluster?element.attributes.cluster:" "}</td>
+            </tr>
+            <tr>
+              <th>Duration: </th>
+              <td> ${element.attributes.duration?element.attributes.duration:" "}</td>
+            </tr>
+            <tr>
+              <th>Element: </th>
+              <td> ${element.attributes.element?element.attributes.element:" "}</td>
+            </tr>
+            <tr>
+              <th>Incident ID: </th>
+              <td> ${element.attributes.incident_id?element.attributes.incident_id:" "}</td>
+            </tr>
+            <tr>
+              <th>Kpi Category: </th>
+              <td> ${element.attributes.kpi_category?element.attributes.kpi_category:" "}</td>
+            </tr>
+            <tr>
+              <th>Kpi Subcategory: </th>
+              <td> ${element.attributes.kpi_subcategory?element.attributes.kpi_subcategory:" "}</td>
+            </tr>
+            <tr>
+              <th>NE Name: </th>
+              <td> ${element.attributes.ne_name?element.attributes.ne_name:" "}</td>
+            </tr>
+            <tr>
+              <th>Notification ID: </th>
+              <td> ${element.attributes.notification_id?element.attributes.notification_id:" "}</td>
+            </tr>
+            <tr>
+              <th>Open Time: </th>
+              <td> ${element.attributes.open_time?element.attributes.open_time:" "}</td>
+            </tr>
+            <tr>
+              <th>Original_event Time: </th>
+              <td> ${element.attributes.original_event_time?element.attributes.original_event_time:" "}</td>
+            </tr>
+            <tr>
+              <th>Problem Category: </th>
+              <td> ${element.attributes.problem_category?element.attributes.problem_category:" "}</td>
+            </tr>
+            <tr>
+              <th>Province City: </th>
+              <td> ${element.attributes.province_city?element.attributes.province_city:" "}</td>
+            </tr>
+            <tr>
+              <th>Reason: </th>
+              <td> ${element.attributes.reason?element.attributes.reason:" "}</td>
+            </tr>
+            <tr>
+              <th>Resolution: </th>
+              <td> ${element.attributes.resolution?element.attributes.resolution:" "}</td>
+            </tr>
+            <tr>
+              <th>Resolution Code: </th>
+              <td> ${element.attributes.resolution_code?element.attributes.resolution_code:" "}</td>
+            </tr>
+            <tr>
+              <th>Service Affected: </th>
+              <td> ${element.attributes.service_affected?element.attributes.service_affected:" "}</td>
+            </tr>
+            <tr>
+              <th>Site ID: </th>
+              <td> ${element.attributes.site_id?element.attributes.site_id:" "}</td>
+            </tr>
+            <tr>
+              <th>Site Name: </th>
+              <td> ${element.attributes.site_name?element.attributes.site_name:" "}</td>
+            </tr>
+            <tr>
+              <th>Status: </th>
+              <td> ${element.attributes.status?element.attributes.status:" "}</td>
+            </tr>
+            <tr>
+              <th>Update Time: </th>
+              <td> ${element.attributes.update_time?element.attributes.update_time:" "}</td>
+            </tr>
+          </tbody>
+        </table>
+          `
+          // console.log("OutagesData",element.attributes);
+          }
+          })
+          .catch(function(error) {
+            // Handle errors
+            console.error("Error performing query:", error);
+          });
+
+            // Handle the query result
+            document.getElementById(caller == "search"?"Data_Container_By_Search":"Data_Container_By_Select").innerHTML +=`
+            <div class="accordion-item">
+            <h2 class="accordion-header" id="headingTwo">
+              <button class="accordion-button collapsed fw-bold text-success" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                Maintenance Site Operation Data
+              </button>
+            </h2>
+            <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#accordionExample">
+              <div class="accordion-body" id=${caller == "search"?"collapseTwoBodySearch":"collapseTwoBodySelect"}>
+              </div>
+            </div>
+           </div>
+            `
+           
+            for (let index = 0; index < result.features.length; index++) {
+              const element = result.features[index];
+              var perationDateObj = new Date(element.attributes.peration_date)
+              document.getElementById(caller == "search"?"collapseTwoBodySearch":"collapseTwoBodySelect").innerHTML +=`
+              <table  class="mt-3 table table-striped table-bordered">
+              <thead>
+                <th colspan="2">Cell ID: ${element.attributes.cell_id?element.attributes.cell_id:" "}</th>
+              </thead>
+            <tbody>
+              <tr>
+                <th>Operation Category: </th>
+                <td> ${element.attributes.operation_category?element.attributes.operation_category:" "}</td>
+              </tr>
+              <tr>
+                <th>Operation ID: </th>
+                <td> ${element.attributes.operation_id?element.attributes.operation_id:" "}</td>
+              </tr>
+              <tr>
+                <th>Operation Name: </th>
+                <td> ${element.attributes.operation_name?element.attributes.operation_name:" "}</td>
+              </tr>
+              <tr>
+                <th>Peration Date: </th>
+                <td> ${perationDateObj?perationDateObj.toUTCString():" "}</td>
+              </tr>
+              <tr>
+                <th>Site ID: </th>
+                <td> ${element.attributes.site_id?element.attributes.site_id:" "}</td>
+              </tr>
+              <tr>
+                <th>Status: </th>
+                <td> ${element.attributes.status?element.attributes.status:" "}</td>
+              </tr>
+            </tbody>
+          </table>
+            `
+              // console.log("MaintenanceSiteOperation",element.attributes);
+            }
+
+          })
+          .catch(function(error) {
+            // Handle errors
+            console.error("Error performing query:", error);
+          });
+      // }, 100);
+    
+
+    }else{
+      if (caller == "search") {
+        document.getElementById("Data_Container_By_Search").innerHTML =`<h3 style="color:gray"> No Data Found </h3>`
+      }else if(caller == "select_on_map"){
+        document.getElementById("Data_Container_By_Select").innerHTML =`<h3 style="color:gray"> No Data Found </h3>`
       }
-    })
-    .catch(function(error) {
-      // Handle errors
-      console.error("Error performing query:", error);
-    });
+    }
 }
 
 // ========================================charts==============================================
@@ -1316,5 +1250,708 @@ function createSymbol(color) {
     }
   };
 }
+
+
+// ===========================================================tables========================================
+
+const featureLayerTwors = map.layers.getItemAt(8); // Grabs the first layer in the map
+const featureLayerHPSMTickets = map.layers.getItemAt(7); // Grabs the first layer in the map
+const featureLayerMaintenanceSiteOperation = new FeatureLayer({
+url: "https://services3.arcgis.com/N0l9vjYH8GLn5HZh/arcgis/rest/services/Asia_Cell_V4/FeatureServer/4"
+});
+const featureLayerOutagesData = new FeatureLayer({
+url: "https://services3.arcgis.com/N0l9vjYH8GLn5HZh/arcgis/rest/services/Asia_Cell_V4/FeatureServer/5"
+});
+featureLayerTwors.title = "Sites";
+featureLayerHPSMTickets.title = "HPSM Tickets";
+featureLayerMaintenanceSiteOperation.title = "Maintenance Site Operation";
+featureLayerOutagesData.title = "OutagesData";
+
+// Create the feature table
+const featureTableTwors = new FeatureTable({
+  view: view, // Required for feature highlight to work
+  layer: featureLayerTwors,
+  visibleElements: {
+    // Autocast to VisibleElements
+    menuItems: {
+      clearSelection: true,
+      refreshData: true,
+      toggleColumns: true,
+      selectedRecordsShowAllToggle: true,
+      selectedRecordsShowSelectedToggle: true,
+      zoomToSelection: true
+    }
+  },
+  tableTemplate: {
+    // Autocast to TableTemplate
+    columnTemplates: [
+      // Takes an array of FieldColumnTemplate and GroupColumnTemplate
+      {
+        // Autocast to FieldColumnTemplate.
+        type: "field",
+        fieldName: "site_id",
+        label: "Site ID",
+        // direction: "des"
+      },
+      {
+        type: "field",
+        fieldName: "site_name",
+        label: "Site Name"
+      },
+      {
+        type: "field",
+        fieldName: "latitude",
+        label: "Latitude"
+      },
+      {
+        type: "field",
+        fieldName: "longitude",
+        label: "Longitude"
+      },
+      {
+        type: "field",
+        fieldName: "total_no_customer",
+        label: "total_no_customer"
+      }
+      ,
+      {
+        type: "field",
+        fieldName: "site_type",
+        label: "Site type"
+      }
+      ,
+      {
+        type: "field",
+        fieldName: "maintenance",
+        label: "maintenance"
+      }
+      ,
+      {
+        type: "field",
+        fieldName: "outages",
+        label: "outages"
+      }
+      ,
+      {
+        type: "field",
+        fieldName: "gov",
+        label: "gov"
+      }
+      ,
+      {
+        type: "field",
+        fieldName: "MaintenanceSiteOperation",
+        label: "MaintenanceSiteOperation"
+      }
+      ,
+      {
+        type: "field",
+        fieldName: "OutagesData",
+        label: "OutagesData"
+      }
+      ,
+      {
+        type: "field",
+        fieldName: "Sites_Buffer3",
+        label: "Sites_Buffer3"
+      }
+      ,
+      {
+        type: "field",
+        fieldName: "CCTicketsFC",
+        label: "CCTicketsFC"
+      }
+    ]
+  },
+  container: document.getElementById("tableDiv-Towers")
+});
+// Create the feature table
+const featureTableHPSMTickets = new FeatureTable({
+  view: view, // Required for feature highlight to work
+  layer: featureLayerHPSMTickets,
+  visibleElements: {
+    // Autocast to VisibleElements
+    menuItems: {
+      clearSelection: true,
+      refreshData: true,
+      toggleColumns: true,
+      selectedRecordsShowAllToggle: true,
+      selectedRecordsShowSelectedToggle: true,
+      zoomToSelection: true
+    }
+  },
+  tableTemplate: {
+    // Autocast to TableTemplate
+    columnTemplates: [
+      // Takes an array of FieldColumnTemplate and GroupColumnTemplate
+      {
+        // Autocast to FieldColumnTemplate.
+        type: "field",
+        fieldName: "im_id",
+        label: "im_id",
+        // direction: "des"
+      },
+      {
+        type: "field",
+        fieldName: "phone_number",
+        label: "phone_number"
+      },
+      {
+        type: "field",
+        fieldName: "sd_id",
+        label: "sd_id"
+      },
+      {
+        type: "field",
+        fieldName: "sd_open_time",
+        label: "sd_open_time"
+      },
+      {
+        type: "field",
+        fieldName: "sd_opened_by",
+        label: "sd_opened_by"
+      }
+      ,
+      {
+        type: "field",
+        fieldName: "sd",
+        label: "sd"
+      }
+      ,
+      {
+        type: "field",
+        fieldName: "sd_status",
+        label: "sd_status"
+      }
+      ,
+      {
+        type: "field",
+        fieldName: "area",
+        label: "area"
+      }
+      ,
+      {
+        type: "field",
+        fieldName: "subcategory",
+        label: "subcategory"
+      }
+      ,
+      {
+        type: "field",
+        fieldName: "sd_close_time",
+        label: "sd_close_time"
+      }
+      ,
+      {
+        type: "field",
+        fieldName: "sd_resolution_time",
+        label: "sd_resolution_time"
+      }
+      ,
+      {
+        type: "field",
+        fieldName: "general_outage",
+        label: "general_outage"
+      }
+      ,
+      {
+        type: "field",
+        fieldName: "sla_status",
+        label: "sla_status"
+      }
+      ,
+      {
+        type: "field",
+        fieldName: "affected_service",
+        label: "affected_service"
+      }
+      ,
+      {
+        type: "field",
+        fieldName: "gouvernorate",
+        label: "gouvernorate"
+      }
+      ,
+      {
+        type: "field",
+        fieldName: "resolution",
+        label: "resolution"
+      }
+      ,
+      {
+        type: "field",
+        fieldName: "resolution_code",
+        label: "resolution_code"
+      }
+      ,
+      {
+        type: "field",
+        fieldName: "cell_id",
+        label: "cell_id"
+      }
+      ,
+      {
+        type: "field",
+        fieldName: "cell_name",
+        label: "cell_name"
+      }
+      ,
+      {
+        type: "field",
+        fieldName: "siteid",
+        label: "siteid"
+      }
+      ,
+      {
+        type: "field",
+        fieldName: "customer_segment",
+        label: "customer_segment"
+      }
+      ,
+      {
+        type: "field",
+        fieldName: "sitename",
+        label: "sitename"
+      }
+      ,
+      {
+        type: "field",
+        fieldName: "reopened",
+        label: "reopened"
+      }
+      ,
+      {
+        type: "field",
+        fieldName: "resolved_by",
+        label: "resolved_by"
+      }
+      ,
+      {
+        type: "field",
+        fieldName: "region",
+        label: "region"
+      }
+      ,
+      {
+        type: "field",
+        fieldName: "resolved_by",
+        label: "resolved_by"
+      }
+      ,
+      {
+        type: "field",
+        fieldName: "expected_resolution_date",
+        label: "expected_resolution_date"
+      }
+    ]
+  },
+  container: document.getElementById("tableDiv-HPSMTickets")
+});
+const featureTableMaintenanceSiteOperation = new FeatureTable({
+  view: view, // Required for feature highlight to work
+  layer: featureLayerMaintenanceSiteOperation,
+  visibleElements: {
+    // Autocast to VisibleElements
+    menuItems: {
+      clearSelection: true,
+      refreshData: true,
+      toggleColumns: true,
+      selectedRecordsShowAllToggle: true,
+      selectedRecordsShowSelectedToggle: true,
+      zoomToSelection: true
+    }
+  },
+  tableTemplate: {
+    // Autocast to TableTemplate
+    columnTemplates: [
+      // Takes an array of FieldColumnTemplate and GroupColumnTemplate
+      {
+        // Autocast to FieldColumnTemplate.
+        type: "field",
+        fieldName: "operation_id",
+        label: "operation_id",
+        // direction: "des"
+      },
+      {
+        type: "field",
+        fieldName: "operation_name",
+        label: "operation_name"
+      },
+      {
+        type: "field",
+        fieldName: "operation_category",
+        label: "operation_category"
+      },
+      {
+        type: "field",
+        fieldName: "peration_date",
+        label: "peration_date"
+      },
+      {
+        type: "field",
+        fieldName: "site_id",
+        label: "site_id"
+      }
+      ,
+      {
+        type: "field",
+        fieldName: "status",
+        label: "status"
+      }
+      ,
+      {
+        type: "field",
+        fieldName: "cell_id",
+        label: "cell_id"
+      }
+    ]
+  },
+  container: document.getElementById("tableDiv-MaintenanceSiteOperation")
+});
+const featureTableOutagesData = new FeatureTable({
+  view: view, // Required for feature highlight to work
+  layer: featureLayerOutagesData,
+  visibleElements: {
+    // Autocast to VisibleElements
+    menuItems: {
+      clearSelection: true,
+      refreshData: true,
+      toggleColumns: true,
+      selectedRecordsShowAllToggle: true,
+      selectedRecordsShowSelectedToggle: true,
+      zoomToSelection: true
+    }
+  },
+  tableTemplate: {
+    // Autocast to TableTemplate
+    columnTemplates: [
+      // Takes an array of FieldColumnTemplate and GroupColumnTemplate
+      {
+        // Autocast to FieldColumnTemplate.
+        type: "field",
+        fieldName: "incident_id",
+        label: "incident_id",
+        // direction: "des"
+      },
+      {
+        type: "field",
+        fieldName: "status",
+        label: "status"
+      },
+      {
+        type: "field",
+        fieldName: "kpi_category",
+        label: "kpi_category"
+      },
+      {
+        type: "field",
+        fieldName: "kpi_subcategory",
+        label: "kpi_subcategory"
+      },
+      {
+        type: "field",
+        fieldName: "assignment",
+        label: "assignment"
+      }
+      ,
+      {
+        type: "field",
+        fieldName: "cluster",
+        label: "cluster"
+      }
+      ,
+      {
+        type: "field",
+        fieldName: "element",
+        label: "element"
+      }
+      ,
+      {
+        type: "field",
+        fieldName: "province_city",
+        label: "province_city"
+      }
+      ,
+      {
+        type: "field",
+        fieldName: "ne_name",
+        label: "ne_name"
+      }
+      ,
+      {
+        type: "field",
+        fieldName: "affectedobject",
+        label: "affectedobject"
+      }
+      ,
+      {
+        type: "field",
+        fieldName: "site_id",
+        label: "site_id"
+      }
+      ,
+      {
+        type: "field",
+        fieldName: "site_name",
+        label: "site_name"
+      }
+      ,
+      {
+        type: "field",
+        fieldName: "original_event_time",
+        label: "original_event_time"
+      }
+      ,
+      {
+        type: "field",
+        fieldName: "clearance_time",
+        label: "clearance_time"
+      }
+      ,
+      {
+        type: "field",
+        fieldName: "close_time",
+        label: "close_time"
+      }
+      ,
+      {
+        type: "field",
+        fieldName: "duration",
+        label: "duration"
+      }
+      ,
+      {
+        type: "field",
+        fieldName: "open_time",
+        label: "open_time"
+      }
+      ,
+      {
+        type: "field",
+        fieldName: "alarm_number",
+        label: "alarm_number"
+      }
+      ,
+      {
+        type: "field",
+        fieldName: "alarm_severity",
+        label: "alarm_severity"
+      }
+      ,
+      {
+        type: "field",
+        fieldName: "affected_sector",
+        label: "affected_sector"
+      }
+      ,
+      {
+        type: "field",
+        fieldName: "problem_category",
+        label: "problem_category"
+      }
+      ,
+      {
+        type: "field",
+        fieldName: "reason",
+        label: "reason"
+      }
+      ,
+      {
+        type: "field",
+        fieldName: "service_affected",
+        label: "service_affected"
+      }
+      ,
+      {
+        type: "field",
+        fieldName: "resolution_code",
+        label: "resolution_code"
+      }
+      ,
+      {
+        type: "field",
+        fieldName: "notification_id",
+        label: "notification_id"
+      }
+      ,
+      {
+        type: "field",
+        fieldName: "resolution",
+        label: "resolution"
+      }
+      ,
+      {
+        type: "field",
+        fieldName: "update_time",
+        label: "update_time"
+      }
+    ]
+  },
+  container: document.getElementById("tableDiv-OutagesData")
+});
+
+// Listen for when the view is stationary.
+// If true, set the table to display only the attributes
+// for the features falling within this extent.
+
+reactiveUtils.when(
+  () => view.stationary,
+  () => {
+    // Filter out and show only the visible features in the feature table.
+    featureTableTwors.filterGeometry = view.extent;
+    featureTableHPSMTickets.filterGeometry = view.extent;
+    featureTableMaintenanceSiteOperation.filterGeometry = view.extent;
+    featureTableOutagesData.filterGeometry = view.extent;
+  },
+  {
+    initial: true
+  }
+);
+
+// Listen for the view's click event and access the associated graphic.
+
+view.on("immediate-click", async (event) => {
+  const response = await view.hitTest(event);
+
+  candidate = response.results.find((result) => {
+    return result.graphic &&
+     result.graphic.layer &&
+      result.graphic.layer === featureLayerTwors &&
+       result.graphic.layer === featureLayerHPSMTickets &&
+        result.graphic.layer === featureLayerMaintenanceSiteOperation &&
+        result.graphic.layer === featureLayerOutagesData 
+  });
+
+  // Add the graphic's ObjectId into the collection of highlightIds.
+  // Check that the featureTableTwors.highlightIds collection
+  // does not include an already highlighted feature.
+  if (candidate) {
+    const objectId = candidate.graphic.getObjectId();
+
+    if (featureTableTwors.highlightIds.includes(objectId)) {
+      // Remove feature from current selection if feature
+      // is already added to highlightIds collection
+      featureTableTwors.highlightIds.remove(objectId);
+    } else {
+      // Add this feature to the featureTableTwors highlightIds collection
+      featureTableTwors.highlightIds.add(objectId);
+    }
+
+    if (featureTableHPSMTickets.highlightIds.includes(objectId)) {
+      // Remove feature from current selection if feature
+      // is already added to highlightIds collection
+      featureTableHPSMTickets.highlightIds.remove(objectId);
+    } else {
+      // Add this feature to the featureTableHPSMTickets highlightIds collection
+      featureTableHPSMTickets.highlightIds.add(objectId);
+    }
+
+    if (featureTableMaintenanceSiteOperation.highlightIds.includes(objectId)) {
+      // Remove feature from current selection if feature
+      // is already added to highlightIds collection
+      featureTableMaintenanceSiteOperation.highlightIds.remove(objectId);
+    } else {
+      // Add this feature to the featureTableOutagesData highlightIds collection
+      featureTableMaintenanceSiteOperation.highlightIds.add(objectId);
+    }
+
+    if (featureTableOutagesData.highlightIds.includes(objectId)) {
+      // Remove feature from current selection if feature
+      // is already added to highlightIds collection
+      featureTableOutagesData.highlightIds.remove(objectId);
+    } else {
+      // Add this feature to the featureTableOutagesData highlightIds collection
+      featureTableOutagesData.highlightIds.add(objectId);
+    }
+  }
+});
+
+// Watch the featureTableTwors's highlightIds.length property,
+// and get the count of highlighted features within
+// the table.
+
+reactiveUtils.watch(
+  () => featureTableTwors.highlightIds.length,
+  (highlightIdsCount) => {
+    // Iterate through the filters within the table.
+    // If the active filter is "Show selection",
+    // changes made to highlightIds (adding/removing)
+    // are reflected.
+
+    featureTableTwors.viewModel.activeFilters.forEach((filter) => {
+      if (filter.type === "selection") {
+        selectionIdCount = filter.objectIds.length; // the filtered selection's id count
+        // Check that the filter selection count is equal to the
+        // highlightIds collection count. If not, update filter selection.
+        if (selectionIdCount !== highlightIdsCount) {
+          featureTableTwors.filterBySelection();
+        }
+      }
+    });
+  }
+);
+
+reactiveUtils.watch(
+  () => featureTableHPSMTickets.highlightIds.length,
+  (highlightIdsCount) => {
+    // Iterate through the filters within the table.
+    // If the active filter is "Show selection",
+    // changes made to highlightIds (adding/removing)
+    // are reflected.
+
+    featureTableHPSMTickets.viewModel.activeFilters.forEach((filter) => {
+      if (filter.type === "selection") {
+        selectionIdCount = filter.objectIds.length; // the filtered selection's id count
+        // Check that the filter selection count is equal to the
+        // highlightIds collection count. If not, update filter selection.
+        if (selectionIdCount !== highlightIdsCount) {
+          featureTableHPSMTickets.filterBySelection();
+        }
+      }
+    });
+  }
+);
+reactiveUtils.watch(
+  () => featureTableMaintenanceSiteOperation.highlightIds.length,
+  (highlightIdsCount) => {
+    // Iterate through the filters within the table.
+    // If the active filter is "Show selection",
+    // changes made to highlightIds (adding/removing)
+    // are reflected.
+
+    featureTableMaintenanceSiteOperation.viewModel.activeFilters.forEach((filter) => {
+      if (filter.type === "selection") {
+        selectionIdCount = filter.objectIds.length; // the filtered selection's id count
+        // Check that the filter selection count is equal to the
+        // highlightIds collection count. If not, update filter selection.
+        if (selectionIdCount !== highlightIdsCount) {
+          featureTableMaintenanceSiteOperation.filterBySelection();
+        }
+      }
+    });
+  }
+);
+reactiveUtils.watch(
+  () => featureTableOutagesData.highlightIds.length,
+  (highlightIdsCount) => {
+    // Iterate through the filters within the table.
+    // If the active filter is "Show selection",
+    // changes made to highlightIds (adding/removing)
+    // are reflected.
+
+    featureTableOutagesData.viewModel.activeFilters.forEach((filter) => {
+      if (filter.type === "selection") {
+        selectionIdCount = filter.objectIds.length; // the filtered selection's id count
+        // Check that the filter selection count is equal to the
+        // highlightIds collection count. If not, update filter selection.
+        if (selectionIdCount !== highlightIdsCount) {
+          featureTableOutagesData.filterBySelection();
+        }
+      }
+    });
+  }
+);
+
+
 })();
 });

@@ -1,307 +1,800 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
-    <title>Timestamp-offset field | Sample | ArcGIS Maps SDK for JavaScript 4.28</title>
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1,user-scalable=no" />
+    <title>FeatureTable with a map | Sample | ArcGIS Maps SDK for JavaScript 4.28</title>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.4.0/Chart.min.js"></script>
-    <script type="module" src="https://js.arcgis.com/calcite-components/1.9.2/calcite.esm.js"></script>
-    <link rel="stylesheet" type="text/css" href="https://js.arcgis.com/calcite-components/1.9.2/calcite.css"/>
     <link rel="stylesheet" href="https://js.arcgis.com/4.28/esri/themes/light/main.css" />
-    <script src="https://js.arcgis.com/4.28/"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.4.0/Chart.min.js"></script>
+    <link href="./bootstrap-5.2.3-dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="https://js.arcgis.com/calcite-components/1.9.2/calcite.css" />
+    <link rel="stylesheet" href="https://js.arcgis.com/4.28/esri/themes/light/main.css" />
 
     <style>
       html,
-      body,
-      #viewDiv {
-        padding: 0;
-        margin: 0;
+      body {
         height: 100%;
         width: 100%;
-      }
-      #rightPanel1 {
-        max-height: 98%;
-      }
-
-      
-      calcite-shell{
-            position: relative;
-            /* height: 100vh; */
-          }
-
-      calcite-shell-panel {
-        --calcite-shell-panel-min-width: 420px;
-        --calcite-shell-panel-width: 420px;
-        --calcite-shell-panel-max-width: 80%;
+        margin: 0;
+        padding: 0;
       }
 
-      calcite-chip[selected] {
-        --calcite-ui-border-1: var(--calcite-ui-brand);
+      #viewDiv {
+        height: 50%;
+        width: 100%;
       }
 
-      .canvas {
-        margin: 0 auto 1rem;
+      .container {
+        height: 50%;
+        width: 100%;
       }
-
-      calcite-chip-group {
-        margin: 1rem auto .5rem;
+      .container, .container-lg, .container-md, .container-sm, .container-xl, .container-xxl {
+          max-width: 1550px;
       }
-  </style>
-   <script>
-    require([
-      "esri/Map",
-      "esri/views/MapView",
-      "esri/layers/FeatureLayer",
-      "esri/widgets/Legend",
-      "esri/widgets/Expand",
-      "esri/WebMap",
-    ], (
-      Map,
-      MapView,
-      FeatureLayer,
-      Legend,
-      Expand,
-      WebMap
-    ) => (async () => {
-      let webmapId  = "f4f6642aa5514d83aae6de0ebb65057e";
-      if (window.location.href.indexOf("?id=") > 0) {
-        webmapId = window.location.href.split("?id=")[1];
-      }
-      const map = new WebMap({
-        portalItem: {
-          id: webmapId
-        }
-      });
-      
+    </style>
 
-      const view = new MapView({
-        map: map,
-        container: "viewDiv",
-        popupEnabled: false,
-      });
-
-      // add fatal accidents of 2021 across USA
-      await map.when();
-      const layer = map.layers.getItemAt(7);
-      console.log(layer);
-      await layer.load();
-      let layerView = await view.whenLayerView(layer);
-
-      // prepare data for total accidents by time of day chart
-
-      // // Accidents by time of day chart
-      // // run stats query to return total number of accidents by time of day
-      // // stats results will be grouped by the time of day
-
-      // // create a bar chart showing total number of accidents by time of day
-
-
-
-      let charts = [],SUBCATEGORYData = [], SUBCATEGORYLabels = [];
-      // Accidents by time of day chart
-      // run stats query to return total number of accidents by time of day
-      // stats results will be grouped by the time of day
-      const SUBCATEGORYResult = await runQuery("1=1", "subcategory");
-      for (let feature of SUBCATEGORYResult.features) {
-        SUBCATEGORYData.push(feature.attributes["count"]);
-        console.log(feature.attributes);
-        SUBCATEGORYLabels.push(feature.attributes["subcategory"]);
-      }
-
-      // create a bar chart showing total number of accidents by time of day
-      updateChart("chart-subcategory", SUBCATEGORYData, SUBCATEGORYLabels, false, 50);
-
-      // this function is called 3 times when the app loads and generates
-      // count stats for accidents 1. by time of day 2. by day of week and 3. by month
-      async function runQuery(where, groupStats) {
-        // create a query object that honors the layer settings
-        let query = layer.createQuery();
-        query.where = where;
-        query.outStatistics = [
-          {
-            statisticType: "count",
-            onStatisticField: "*",
-            outStatisticFieldName: "count"
-          }
-        ];
-        query.groupByFieldsForStatistics = [groupStats];
-        query.orderByFields = [groupStats];
-        let result = await layer.queryFeatures(query);
-        return result;
-      }
-
-      // Keeps track of a selected bar on monthly or week day chart
-      // We use this info to toggle the clicked bar color
-      let previouslySelectedBarIndex = null;
-
-      // this function is called when user hover the mouse over accidents charts.
-      // Accidents layer view feature effect will be updated to highlight features
-      // that fall within the selected time, week day or month
-      async function applyFilterToAccidentsData(event, chart) {
-        const activePoints = chart.getElementsAtEvent(event);
-        // user did not click on a bar. stop here.
-        if (activePoints.length == 0) {
-          return;
-        }
-        const chartData = activePoints[0]["_chart"].config.data;
-        const idx = activePoints[0]["_index"];
-
-        // There is a selected bar already. Clear up the previous selection before applying a new change
-        if (previouslySelectedBarIndex >= 0) {
-          // change the bar color back to blue
-          changeBarColor(chart, previouslySelectedBarIndex);
-          // clear the feature effect and reset the previous index
-          if (previouslySelectedBarIndex === idx) {
-            previouslySelectedBarIndex = null;
-            layerView.featureEffect = undefined;
-
-
-            return;
-          }
-        }
-
-        // feature effect will be applied based on the chart bar user clicked on
-        if (activePoints[0]) {
-          const label = chartData.labels[idx];
-
-          changeBarColor(chart, idx);
-          previouslySelectedBarIndex = idx;
-          let where;
-          // apply effect to accidents happened during the selected hour
-
-            const queryValue = label;
-            where = `subcategory = '${queryValue}'`;
-          
-          layerView.featureEffect = {
-            filter: {
-              where
-            },
-            excludedEffect: "blur(2px) opacity(0.2) grayscale(0.2)"
-          };
-        }
-      }
-
-      async function dayDistributionStats(where, groupStats, label) {
-        const result = await runQuery(where, groupStats);
-        let chartData = [], chartLabels = [];
-
-        for (let feature of result.features) {
-          chartData.push(feature.attributes["count"]);
-          chartLabels.push(feature.attributes["EXPR_1"]);
-        }
-
-        if (dayChartBreakDownBlock.style.display === "none") {
-          dayChartBreakDownBlock.style.display = "block";
-        }
-
-        dayChartBreakDownBlock.heading = label;
-
-      }
-
-      // called from applyFilterToAccidentsData function to update the clicked bar color
-      function changeBarColor(chart, index) {
-        // chart.data.datasets[0].backgroundColor[index] = color;
-        chart.update();
-      }
-
-      // UI controls visible in the upper right panel
-      let activeGraph = "day";
-
-      const chartDay = document.getElementById("chart-subcategory");
-
-      // this function is called when the app loads. It creates three charts showing
-      // total accidents by time of day, by day of the week and months
-      function updateChart(canvas, data, labels, remove, max) {
-        const canvasElement = document.getElementById(canvas);
-
-        // Get the canvas element and render the chart in it
-        let chart = new Chart(canvasElement.getContext("2d"), {
-          type: "doughnut",
-          data: {
-            labels: labels,
-            datasets: [
-              {
-                backgroundColor: [
-                      "#9e549c",
-                      "#f789d8",
-                      "#149dcf",
-                      "#ed5050",
-                      "#ffde3e",
-                      "#a6c736",
-                      "#b7804a",
-                      "#fc9220",
-                      "#9e9e9e"
-                    ],
-                data: data
-              }
-            ]
-          },
-          options: {
-              responsive: false,
-              cutoutPercentage: 0,
-              legend: {
-                position: "bottom"
-              },
-              title: {
-                display: true,
-                text: "Building Material"
-              }
-            },
-            size: 50
-        });
-        if (!remove) {
-          charts.push(chart);
-          // add mouse-move event listener on the charts so that we can display features
-          // corresponding to the selected by on the chart
-          canvasElement.addEventListener("click", async () => {
-            const data = await applyFilterToAccidentsData(event, chart);
-          });
-        }
-
-        return chart;
-      }
-
-      // add a legend widget to the view
-      const legendExpand = new Expand({
-        expandIcon: "legend",
-        view: view,
-        content: new Legend({
-          view,
-          layerInfos: [
-            {
-              layer: layer,
-              title: "Fatal accidents by time of day (2021)"
-            }
-          ]
-        })
-      });
-      view.ui.add(legendExpand, "bottom-left");
-
-      function createSymbol(color) {
-        return {
-          type: "simple-marker",
-          color: color,
-          size: "5px",
-          outline: null,
-          outline: {
-            color: "rgba(153, 31, 23, 0.3)",
-            width: 0.3
-          }
-        };
-      }
-    })());
-  </script>
   </head>
+
   <body>
     <div id="viewDiv"></div>
-    <calcite-shell content-behind class="custom-example-theme">
-      <calcite-shell-panel id="rightPanel1" slot="panel-end" display-mode="float">
-        <calcite-panel id="statsPanel1" heading="" description="">
-          <calcite-block open id="chart-block" heading="">
-            <canvas class="canvas" id="chart-subcategory" height="200" width="400"></canvas>
-          </calcite-block>
-        </calcite-panel>
-      </calcite-shell-panel>
-  </calcite-shell>
+    <nav>
+      <div class="nav nav-tabs mt-3" id="nav-tab" role="tablist">
+        <button class="nav-link active" id="nav-Towers-tab" data-bs-toggle="tab" data-bs-target="#nav-Towers" type="button" role="tab" aria-controls="nav-Towers" aria-selected="true">Towers</button>
+        <button class="nav-link" id="nav-HPMS-Tickets-tab" data-bs-toggle="tab" data-bs-target="#nav-HPMS-Tickets" type="button" role="tab" aria-controls="nav-HPMS-Tickets" aria-selected="false">HPMS Tickets</button>
+        <button class="nav-link" id="nav-Maintenance-Site-Operation-tab" data-bs-toggle="tab" data-bs-target="#nav-Maintenance-Site-Operation" type="button" role="tab" aria-controls="nav-Maintenance-Site-Operation" aria-selected="false">Maintenance Site Operation</button>
+        <button class="nav-link" id="nav-OutagesData-tab" data-bs-toggle="tab" data-bs-target="#nav-OutagesData" type="button" role="tab" aria-controls="nav-OutagesData" aria-selected="false" >OutagesData</button>
+      </div>
+    </nav>
+    <div class="tab-content" id="nav-tabContent">
+        <div class="container tab-pane fade show active" id="nav-Towers" role="tabpanel" aria-labelledby="nav-Towers-tab" tabindex="0">
+           <div id="tableDiv-Towers">
+        </div>
+     </div>
+      <div class="container tab-pane fade" id="nav-HPMS-Tickets" role="tabpanel" aria-labelledby="nav-HPMS-Tickets-tab" tabindex="0">
+        <div id="tableDiv-HPSMTickets">
+        </div>
+      </div>
+      <div class="tab-pane fade" id="nav-Maintenance-Site-Operation" role="tabpanel" aria-labelledby="nav-Maintenance-Site-Operation-tab" tabindex="0">
+        <div id="tableDiv-MaintenanceSiteOperation">
+        </div>
+      </div>
+      <div class="tab-pane fade" id="nav-OutagesData" role="tabpanel" aria-labelledby="nav-OutagesData-tab" tabindex="0">
+        <div id="tableDiv-OutagesData">
+        </div>
+      </div>
+    </div>
+    <script src="./bootstrap-5.2.3-dist/js/bootstrap.bundle.min.js" integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4" crossorigin="anonymous"></script>
+    <script src="https://unpkg.com/@esri/arcgis-rest-request@4.0.0/dist/bundled/request.umd.js"></script>
+    <script src="https://unpkg.com/@esri/arcgis-rest-feature-service@4.0.0/dist/bundled/feature-service.umd.js"></script>
+    <script src="https://js.arcgis.com/4.28/"></script>
+    <script type="module" src="https://js.arcgis.com/calcite-components/1.9.2/calcite.esm.js"></script>
+    <script
+    src="https://code.jquery.com/jquery-3.6.0.min.js"
+    integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
+    crossorigin="anonymous"></script>
+    <script>
+      require([
+        "esri/WebMap",
+        "esri/views/MapView",
+        "esri/core/reactiveUtils",
+        "esri/layers/FeatureLayer",
+        "esri/widgets/FeatureTable"
+      ], (WebMap, MapView, reactiveUtils, FeatureLayer, FeatureTable) => {
+        let selectionIdCount = 0; // The filtered selection id count
+        let candidate; // The graphic accessed via the view.click event
+
+        const webmap = new WebMap({
+          portalItem: {
+            id: "f4f6642aa5514d83aae6de0ebb65057e"
+          }
+        });
+
+        const view = new MapView({
+          container: "viewDiv",
+          map: webmap,
+        });
+
+        view.when(() => {
+          console.log(webmap.layers.getItemAt(8));
+          const featureLayerTwors = webmap.layers.getItemAt(8); // Grabs the first layer in the map
+          const featureLayerHPSMTickets = webmap.layers.getItemAt(7); // Grabs the first layer in the map
+          const featureLayerMaintenanceSiteOperation = new FeatureLayer({
+          url: "https://services3.arcgis.com/N0l9vjYH8GLn5HZh/arcgis/rest/services/Asia_Cell_V4/FeatureServer/4"
+          });
+          const featureLayerOutagesData = new FeatureLayer({
+          url: "https://services3.arcgis.com/N0l9vjYH8GLn5HZh/arcgis/rest/services/Asia_Cell_V4/FeatureServer/5"
+          });
+          featureLayerTwors.title = "Towers";
+          featureLayerHPSMTickets.title = "HPSM Tickets";
+          featureLayerMaintenanceSiteOperation.title = "Maintenance Site Operation";
+          featureLayerOutagesData.title = "OutagesData";
+
+          // Create the feature table
+          const featureTableTwors = new FeatureTable({
+            view: view, // Required for feature highlight to work
+            layer: featureLayerTwors,
+            visibleElements: {
+              // Autocast to VisibleElements
+              menuItems: {
+                clearSelection: true,
+                refreshData: true,
+                toggleColumns: true,
+                selectedRecordsShowAllToggle: true,
+                selectedRecordsShowSelectedToggle: true,
+                zoomToSelection: true
+              }
+            },
+            tableTemplate: {
+              // Autocast to TableTemplate
+              columnTemplates: [
+                // Takes an array of FieldColumnTemplate and GroupColumnTemplate
+                {
+                  // Autocast to FieldColumnTemplate.
+                  type: "field",
+                  fieldName: "site_id",
+                  label: "Site ID",
+                  // direction: "des"
+                },
+                {
+                  type: "field",
+                  fieldName: "site_name",
+                  label: "Site Name"
+                },
+                {
+                  type: "field",
+                  fieldName: "latitude",
+                  label: "Latitude"
+                },
+                {
+                  type: "field",
+                  fieldName: "longitude",
+                  label: "Longitude"
+                },
+                {
+                  type: "field",
+                  fieldName: "total_no_customer",
+                  label: "total_no_customer"
+                }
+                ,
+                {
+                  type: "field",
+                  fieldName: "site_type",
+                  label: "Site type"
+                }
+                ,
+                {
+                  type: "field",
+                  fieldName: "maintenance",
+                  label: "maintenance"
+                }
+                ,
+                {
+                  type: "field",
+                  fieldName: "outages",
+                  label: "outages"
+                }
+                ,
+                {
+                  type: "field",
+                  fieldName: "gov",
+                  label: "gov"
+                }
+                ,
+                {
+                  type: "field",
+                  fieldName: "MaintenanceSiteOperation",
+                  label: "MaintenanceSiteOperation"
+                }
+                ,
+                {
+                  type: "field",
+                  fieldName: "OutagesData",
+                  label: "OutagesData"
+                }
+                ,
+                {
+                  type: "field",
+                  fieldName: "Sites_Buffer3",
+                  label: "Sites_Buffer3"
+                }
+                ,
+                {
+                  type: "field",
+                  fieldName: "CCTicketsFC",
+                  label: "CCTicketsFC"
+                }
+              ]
+            },
+            container: document.getElementById("tableDiv-Towers")
+          });
+          // Create the feature table
+          const featureTableHPSMTickets = new FeatureTable({
+            view: view, // Required for feature highlight to work
+            layer: featureLayerHPSMTickets,
+            visibleElements: {
+              // Autocast to VisibleElements
+              menuItems: {
+                clearSelection: true,
+                refreshData: true,
+                toggleColumns: true,
+                selectedRecordsShowAllToggle: true,
+                selectedRecordsShowSelectedToggle: true,
+                zoomToSelection: true
+              }
+            },
+            tableTemplate: {
+              // Autocast to TableTemplate
+              columnTemplates: [
+                // Takes an array of FieldColumnTemplate and GroupColumnTemplate
+                {
+                  // Autocast to FieldColumnTemplate.
+                  type: "field",
+                  fieldName: "im_id",
+                  label: "im_id",
+                  // direction: "des"
+                },
+                {
+                  type: "field",
+                  fieldName: "phone_number",
+                  label: "phone_number"
+                },
+                {
+                  type: "field",
+                  fieldName: "sd_id",
+                  label: "sd_id"
+                },
+                {
+                  type: "field",
+                  fieldName: "sd_open_time",
+                  label: "sd_open_time"
+                },
+                {
+                  type: "field",
+                  fieldName: "sd_opened_by",
+                  label: "sd_opened_by"
+                }
+                ,
+                {
+                  type: "field",
+                  fieldName: "sd",
+                  label: "sd"
+                }
+                ,
+                {
+                  type: "field",
+                  fieldName: "sd_status",
+                  label: "sd_status"
+                }
+                ,
+                {
+                  type: "field",
+                  fieldName: "area",
+                  label: "area"
+                }
+                ,
+                {
+                  type: "field",
+                  fieldName: "subcategory",
+                  label: "subcategory"
+                }
+                ,
+                {
+                  type: "field",
+                  fieldName: "sd_close_time",
+                  label: "sd_close_time"
+                }
+                ,
+                {
+                  type: "field",
+                  fieldName: "sd_resolution_time",
+                  label: "sd_resolution_time"
+                }
+                ,
+                {
+                  type: "field",
+                  fieldName: "general_outage",
+                  label: "general_outage"
+                }
+                ,
+                {
+                  type: "field",
+                  fieldName: "sla_status",
+                  label: "sla_status"
+                }
+                ,
+                {
+                  type: "field",
+                  fieldName: "affected_service",
+                  label: "affected_service"
+                }
+                ,
+                {
+                  type: "field",
+                  fieldName: "gouvernorate",
+                  label: "gouvernorate"
+                }
+                ,
+                {
+                  type: "field",
+                  fieldName: "resolution",
+                  label: "resolution"
+                }
+                ,
+                {
+                  type: "field",
+                  fieldName: "resolution_code",
+                  label: "resolution_code"
+                }
+                ,
+                {
+                  type: "field",
+                  fieldName: "cell_id",
+                  label: "cell_id"
+                }
+                ,
+                {
+                  type: "field",
+                  fieldName: "cell_name",
+                  label: "cell_name"
+                }
+                ,
+                {
+                  type: "field",
+                  fieldName: "siteid",
+                  label: "siteid"
+                }
+                ,
+                {
+                  type: "field",
+                  fieldName: "customer_segment",
+                  label: "customer_segment"
+                }
+                ,
+                {
+                  type: "field",
+                  fieldName: "sitename",
+                  label: "sitename"
+                }
+                ,
+                {
+                  type: "field",
+                  fieldName: "reopened",
+                  label: "reopened"
+                }
+                ,
+                {
+                  type: "field",
+                  fieldName: "resolved_by",
+                  label: "resolved_by"
+                }
+                ,
+                {
+                  type: "field",
+                  fieldName: "region",
+                  label: "region"
+                }
+                ,
+                {
+                  type: "field",
+                  fieldName: "resolved_by",
+                  label: "resolved_by"
+                }
+                ,
+                {
+                  type: "field",
+                  fieldName: "expected_resolution_date",
+                  label: "expected_resolution_date"
+                }
+              ]
+            },
+            container: document.getElementById("tableDiv-HPSMTickets")
+          });
+          const featureTableMaintenanceSiteOperation = new FeatureTable({
+            view: view, // Required for feature highlight to work
+            layer: featureLayerMaintenanceSiteOperation,
+            visibleElements: {
+              // Autocast to VisibleElements
+              menuItems: {
+                clearSelection: true,
+                refreshData: true,
+                toggleColumns: true,
+                selectedRecordsShowAllToggle: true,
+                selectedRecordsShowSelectedToggle: true,
+                zoomToSelection: true
+              }
+            },
+            tableTemplate: {
+              // Autocast to TableTemplate
+              columnTemplates: [
+                // Takes an array of FieldColumnTemplate and GroupColumnTemplate
+                {
+                  // Autocast to FieldColumnTemplate.
+                  type: "field",
+                  fieldName: "operation_id",
+                  label: "operation_id",
+                  // direction: "des"
+                },
+                {
+                  type: "field",
+                  fieldName: "operation_name",
+                  label: "operation_name"
+                },
+                {
+                  type: "field",
+                  fieldName: "operation_category",
+                  label: "operation_category"
+                },
+                {
+                  type: "field",
+                  fieldName: "peration_date",
+                  label: "peration_date"
+                },
+                {
+                  type: "field",
+                  fieldName: "site_id",
+                  label: "site_id"
+                }
+                ,
+                {
+                  type: "field",
+                  fieldName: "status",
+                  label: "status"
+                }
+                ,
+                {
+                  type: "field",
+                  fieldName: "cell_id",
+                  label: "cell_id"
+                }
+              ]
+            },
+            container: document.getElementById("tableDiv-MaintenanceSiteOperation")
+          });
+          const featureTableOutagesData = new FeatureTable({
+            view: view, // Required for feature highlight to work
+            layer: featureLayerOutagesData,
+            visibleElements: {
+              // Autocast to VisibleElements
+              menuItems: {
+                clearSelection: true,
+                refreshData: true,
+                toggleColumns: true,
+                selectedRecordsShowAllToggle: true,
+                selectedRecordsShowSelectedToggle: true,
+                zoomToSelection: true
+              }
+            },
+            tableTemplate: {
+              // Autocast to TableTemplate
+              columnTemplates: [
+                // Takes an array of FieldColumnTemplate and GroupColumnTemplate
+                {
+                  // Autocast to FieldColumnTemplate.
+                  type: "field",
+                  fieldName: "incident_id",
+                  label: "incident_id",
+                  // direction: "des"
+                },
+                {
+                  type: "field",
+                  fieldName: "status",
+                  label: "status"
+                },
+                {
+                  type: "field",
+                  fieldName: "kpi_category",
+                  label: "kpi_category"
+                },
+                {
+                  type: "field",
+                  fieldName: "kpi_subcategory",
+                  label: "kpi_subcategory"
+                },
+                {
+                  type: "field",
+                  fieldName: "assignment",
+                  label: "assignment"
+                }
+                ,
+                {
+                  type: "field",
+                  fieldName: "cluster",
+                  label: "cluster"
+                }
+                ,
+                {
+                  type: "field",
+                  fieldName: "element",
+                  label: "element"
+                }
+                ,
+                {
+                  type: "field",
+                  fieldName: "province_city",
+                  label: "province_city"
+                }
+                ,
+                {
+                  type: "field",
+                  fieldName: "ne_name",
+                  label: "ne_name"
+                }
+                ,
+                {
+                  type: "field",
+                  fieldName: "affectedobject",
+                  label: "affectedobject"
+                }
+                ,
+                {
+                  type: "field",
+                  fieldName: "site_id",
+                  label: "site_id"
+                }
+                ,
+                {
+                  type: "field",
+                  fieldName: "site_name",
+                  label: "site_name"
+                }
+                ,
+                {
+                  type: "field",
+                  fieldName: "original_event_time",
+                  label: "original_event_time"
+                }
+                ,
+                {
+                  type: "field",
+                  fieldName: "clearance_time",
+                  label: "clearance_time"
+                }
+                ,
+                {
+                  type: "field",
+                  fieldName: "close_time",
+                  label: "close_time"
+                }
+                ,
+                {
+                  type: "field",
+                  fieldName: "duration",
+                  label: "duration"
+                }
+                ,
+                {
+                  type: "field",
+                  fieldName: "open_time",
+                  label: "open_time"
+                }
+                ,
+                {
+                  type: "field",
+                  fieldName: "alarm_number",
+                  label: "alarm_number"
+                }
+                ,
+                {
+                  type: "field",
+                  fieldName: "alarm_severity",
+                  label: "alarm_severity"
+                }
+                ,
+                {
+                  type: "field",
+                  fieldName: "affected_sector",
+                  label: "affected_sector"
+                }
+                ,
+                {
+                  type: "field",
+                  fieldName: "problem_category",
+                  label: "problem_category"
+                }
+                ,
+                {
+                  type: "field",
+                  fieldName: "reason",
+                  label: "reason"
+                }
+                ,
+                {
+                  type: "field",
+                  fieldName: "service_affected",
+                  label: "service_affected"
+                }
+                ,
+                {
+                  type: "field",
+                  fieldName: "resolution_code",
+                  label: "resolution_code"
+                }
+                ,
+                {
+                  type: "field",
+                  fieldName: "notification_id",
+                  label: "notification_id"
+                }
+                ,
+                {
+                  type: "field",
+                  fieldName: "resolution",
+                  label: "resolution"
+                }
+                ,
+                {
+                  type: "field",
+                  fieldName: "update_time",
+                  label: "update_time"
+                }
+              ]
+            },
+            container: document.getElementById("tableDiv-OutagesData")
+          });
+
+          // Listen for when the view is stationary.
+          // If true, set the table to display only the attributes
+          // for the features falling within this extent.
+
+          reactiveUtils.when(
+            () => view.stationary,
+            () => {
+              // Filter out and show only the visible features in the feature table.
+              featureTableTwors.filterGeometry = view.extent;
+              featureTableHPSMTickets.filterGeometry = view.extent;
+              featureTableMaintenanceSiteOperation.filterGeometry = view.extent;
+              featureTableOutagesData.filterGeometry = view.extent;
+            },
+            {
+              initial: true
+            }
+          );
+
+          // Listen for the view's click event and access the associated graphic.
+
+          view.on("immediate-click", async (event) => {
+            const response = await view.hitTest(event);
+
+            candidate = response.results.find((result) => {
+              return result.graphic &&
+               result.graphic.layer &&
+                result.graphic.layer === featureLayerTwors &&
+                 result.graphic.layer === featureLayerHPSMTickets &&
+                  result.graphic.layer === featureLayerMaintenanceSiteOperation &&
+                  result.graphic.layer === featureLayerOutagesData 
+            });
+
+            // Add the graphic's ObjectId into the collection of highlightIds.
+            // Check that the featureTableTwors.highlightIds collection
+            // does not include an already highlighted feature.
+            if (candidate) {
+              const objectId = candidate.graphic.getObjectId();
+
+              if (featureTableTwors.highlightIds.includes(objectId)) {
+                // Remove feature from current selection if feature
+                // is already added to highlightIds collection
+                featureTableTwors.highlightIds.remove(objectId);
+              } else {
+                // Add this feature to the featureTableTwors highlightIds collection
+                featureTableTwors.highlightIds.add(objectId);
+              }
+
+              if (featureTableHPSMTickets.highlightIds.includes(objectId)) {
+                // Remove feature from current selection if feature
+                // is already added to highlightIds collection
+                featureTableHPSMTickets.highlightIds.remove(objectId);
+              } else {
+                // Add this feature to the featureTableHPSMTickets highlightIds collection
+                featureTableHPSMTickets.highlightIds.add(objectId);
+              }
+
+              if (featureTableMaintenanceSiteOperation.highlightIds.includes(objectId)) {
+                // Remove feature from current selection if feature
+                // is already added to highlightIds collection
+                featureTableMaintenanceSiteOperation.highlightIds.remove(objectId);
+              } else {
+                // Add this feature to the featureTableOutagesData highlightIds collection
+                featureTableMaintenanceSiteOperation.highlightIds.add(objectId);
+              }
+
+              if (featureTableOutagesData.highlightIds.includes(objectId)) {
+                // Remove feature from current selection if feature
+                // is already added to highlightIds collection
+                featureTableOutagesData.highlightIds.remove(objectId);
+              } else {
+                // Add this feature to the featureTableOutagesData highlightIds collection
+                featureTableOutagesData.highlightIds.add(objectId);
+              }
+            }
+          });
+
+          // Watch the featureTableTwors's highlightIds.length property,
+          // and get the count of highlighted features within
+          // the table.
+
+          reactiveUtils.watch(
+            () => featureTableTwors.highlightIds.length,
+            (highlightIdsCount) => {
+              // Iterate through the filters within the table.
+              // If the active filter is "Show selection",
+              // changes made to highlightIds (adding/removing)
+              // are reflected.
+
+              featureTableTwors.viewModel.activeFilters.forEach((filter) => {
+                if (filter.type === "selection") {
+                  selectionIdCount = filter.objectIds.length; // the filtered selection's id count
+                  // Check that the filter selection count is equal to the
+                  // highlightIds collection count. If not, update filter selection.
+                  if (selectionIdCount !== highlightIdsCount) {
+                    featureTableTwors.filterBySelection();
+                  }
+                }
+              });
+            }
+          );
+
+          reactiveUtils.watch(
+            () => featureTableHPSMTickets.highlightIds.length,
+            (highlightIdsCount) => {
+              // Iterate through the filters within the table.
+              // If the active filter is "Show selection",
+              // changes made to highlightIds (adding/removing)
+              // are reflected.
+
+              featureTableHPSMTickets.viewModel.activeFilters.forEach((filter) => {
+                if (filter.type === "selection") {
+                  selectionIdCount = filter.objectIds.length; // the filtered selection's id count
+                  // Check that the filter selection count is equal to the
+                  // highlightIds collection count. If not, update filter selection.
+                  if (selectionIdCount !== highlightIdsCount) {
+                    featureTableHPSMTickets.filterBySelection();
+                  }
+                }
+              });
+            }
+          );
+          reactiveUtils.watch(
+            () => featureTableMaintenanceSiteOperation.highlightIds.length,
+            (highlightIdsCount) => {
+              // Iterate through the filters within the table.
+              // If the active filter is "Show selection",
+              // changes made to highlightIds (adding/removing)
+              // are reflected.
+
+              featureTableMaintenanceSiteOperation.viewModel.activeFilters.forEach((filter) => {
+                if (filter.type === "selection") {
+                  selectionIdCount = filter.objectIds.length; // the filtered selection's id count
+                  // Check that the filter selection count is equal to the
+                  // highlightIds collection count. If not, update filter selection.
+                  if (selectionIdCount !== highlightIdsCount) {
+                    featureTableMaintenanceSiteOperation.filterBySelection();
+                  }
+                }
+              });
+            }
+          );
+          reactiveUtils.watch(
+            () => featureTableOutagesData.highlightIds.length,
+            (highlightIdsCount) => {
+              // Iterate through the filters within the table.
+              // If the active filter is "Show selection",
+              // changes made to highlightIds (adding/removing)
+              // are reflected.
+
+              featureTableOutagesData.viewModel.activeFilters.forEach((filter) => {
+                if (filter.type === "selection") {
+                  selectionIdCount = filter.objectIds.length; // the filtered selection's id count
+                  // Check that the filter selection count is equal to the
+                  // highlightIds collection count. If not, update filter selection.
+                  if (selectionIdCount !== highlightIdsCount) {
+                    featureTableOutagesData.filterBySelection();
+                  }
+                }
+              });
+            }
+          );
+        });
+      });
+    </script>
   </body>
 </html>
