@@ -645,14 +645,72 @@ console.log("ffffff",site_id);
           });
         }
 
-
       // Execute the query
-      // setTimeout(() => {
       
         MaintenanceSiteOperationFeatureLayer.queryFeatures(queryParams)
           .then(function(result) {
 
-                          // Execute the query
+            // Handle the query result
+            document.getElementById(caller == "search"?"Data_Container_By_Search":"Data_Container_By_Select").innerHTML +=`
+            <div class="accordion-item">
+            <h2 class="accordion-header" id="headingTwo">
+              <button class="accordion-button collapsed fw-bold text-success" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                Maintenance Site Operation Data
+              </button>
+            </h2>
+            <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#accordionExample">
+              <div class="accordion-body" id=${caller == "search"?"collapseTwoBodySearch":"collapseTwoBodySelect"}>
+              </div>
+            </div>
+           </div>
+            `
+           
+            for (let index = 0; index < result.features.length; index++) {
+              const element = result.features[index];
+              var perationDateObj = new Date(element.attributes.peration_date)
+              document.getElementById(caller == "search"?"collapseTwoBodySearch":"collapseTwoBodySelect").innerHTML +=`
+              <table  class="mt-3 table table-striped table-bordered">
+              <thead>
+                <th colspan="2">Cell ID: ${element.attributes.cell_id?element.attributes.cell_id:" "}</th>
+              </thead>
+            <tbody>
+              <tr>
+                <th>Operation Category: </th>
+                <td> ${element.attributes.operation_category?element.attributes.operation_category:" "}</td>
+              </tr>
+              <tr>
+                <th>Operation ID: </th>
+                <td> ${element.attributes.operation_id?element.attributes.operation_id:" "}</td>
+              </tr>
+              <tr>
+                <th>Operation Name: </th>
+                <td> ${element.attributes.operation_name?element.attributes.operation_name:" "}</td>
+              </tr>
+              <tr>
+                <th>Peration Date: </th>
+                <td> ${perationDateObj?perationDateObj.toUTCString():" "}</td>
+              </tr>
+              <tr>
+                <th>Site ID: </th>
+                <td> ${element.attributes.site_id?element.attributes.site_id:" "}</td>
+              </tr>
+              <tr>
+                <th>Status: </th>
+                <td> ${element.attributes.status?element.attributes.status:" "}</td>
+              </tr>
+            </tbody>
+          </table>
+            `
+              // console.log("MaintenanceSiteOperation",element.attributes);
+            }
+
+          })
+          .catch(function(error) {
+            // Handle errors
+            console.error("Error performing query:", error);
+          });
+    
+       // Execute the query
         OutagesDataFeatureLayer.queryFeatures(queryParams)
         .then(function(result) {
           // Handle the query result
@@ -801,68 +859,6 @@ console.log("ffffff",site_id);
             // Handle errors
             console.error("Error performing query:", error);
           });
-
-            // Handle the query result
-            document.getElementById(caller == "search"?"Data_Container_By_Search":"Data_Container_By_Select").innerHTML +=`
-            <div class="accordion-item">
-            <h2 class="accordion-header" id="headingTwo">
-              <button class="accordion-button collapsed fw-bold text-success" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
-                Maintenance Site Operation Data
-              </button>
-            </h2>
-            <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#accordionExample">
-              <div class="accordion-body" id=${caller == "search"?"collapseTwoBodySearch":"collapseTwoBodySelect"}>
-              </div>
-            </div>
-           </div>
-            `
-           
-            for (let index = 0; index < result.features.length; index++) {
-              const element = result.features[index];
-              var perationDateObj = new Date(element.attributes.peration_date)
-              document.getElementById(caller == "search"?"collapseTwoBodySearch":"collapseTwoBodySelect").innerHTML +=`
-              <table  class="mt-3 table table-striped table-bordered">
-              <thead>
-                <th colspan="2">Cell ID: ${element.attributes.cell_id?element.attributes.cell_id:" "}</th>
-              </thead>
-            <tbody>
-              <tr>
-                <th>Operation Category: </th>
-                <td> ${element.attributes.operation_category?element.attributes.operation_category:" "}</td>
-              </tr>
-              <tr>
-                <th>Operation ID: </th>
-                <td> ${element.attributes.operation_id?element.attributes.operation_id:" "}</td>
-              </tr>
-              <tr>
-                <th>Operation Name: </th>
-                <td> ${element.attributes.operation_name?element.attributes.operation_name:" "}</td>
-              </tr>
-              <tr>
-                <th>Peration Date: </th>
-                <td> ${perationDateObj?perationDateObj.toUTCString():" "}</td>
-              </tr>
-              <tr>
-                <th>Site ID: </th>
-                <td> ${element.attributes.site_id?element.attributes.site_id:" "}</td>
-              </tr>
-              <tr>
-                <th>Status: </th>
-                <td> ${element.attributes.status?element.attributes.status:" "}</td>
-              </tr>
-            </tbody>
-          </table>
-            `
-              // console.log("MaintenanceSiteOperation",element.attributes);
-            }
-
-          })
-          .catch(function(error) {
-            // Handle errors
-            console.error("Error performing query:", error);
-          });
-      // }, 100);
-    
 
     }else{
       if (caller == "search") {
@@ -1298,16 +1294,16 @@ const featureTableTwors = new FeatureTable({
         fieldName: "site_name",
         label: "Site Name"
       },
-      {
-        type: "field",
-        fieldName: "latitude",
-        label: "Latitude"
-      },
-      {
-        type: "field",
-        fieldName: "longitude",
-        label: "Longitude"
-      },
+      // {
+      //   type: "field",
+      //   fieldName: "latitude",
+      //   label: "Latitude"
+      // },
+      // {
+      //   type: "field",
+      //   fieldName: "longitude",
+      //   label: "Longitude"
+      // },
       {
         type: "field",
         fieldName: "total_no_customer",
