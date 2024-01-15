@@ -5,10 +5,7 @@
     <title>FeatureTable with a map | Sample | ArcGIS Maps SDK for JavaScript 4.28</title>
 
     <link rel="stylesheet" href="https://js.arcgis.com/4.28/esri/themes/light/main.css" />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.4.0/Chart.min.js"></script>
-    <link href="./bootstrap-5.2.3-dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
-    <link rel="stylesheet" type="text/css" href="https://js.arcgis.com/calcite-components/1.9.2/calcite.css" />
-    <link rel="stylesheet" href="https://js.arcgis.com/4.28/esri/themes/light/main.css" />
+    <script src="https://js.arcgis.com/4.28/"></script>
 
     <style>
       html,
@@ -28,50 +25,7 @@
         height: 50%;
         width: 100%;
       }
-      .container, .container-lg, .container-md, .container-sm, .container-xl, .container-xxl {
-          max-width: 1550px;
-      }
     </style>
-
-  </head>
-
-  <body>
-    <div id="viewDiv"></div>
-    <nav>
-      <div class="nav nav-tabs mt-3" id="nav-tab" role="tablist">
-        <button class="nav-link active" id="nav-Towers-tab" data-bs-toggle="tab" data-bs-target="#nav-Towers" type="button" role="tab" aria-controls="nav-Towers" aria-selected="true">Towers</button>
-        <button class="nav-link" id="nav-HPMS-Tickets-tab" data-bs-toggle="tab" data-bs-target="#nav-HPMS-Tickets" type="button" role="tab" aria-controls="nav-HPMS-Tickets" aria-selected="false">HPMS Tickets</button>
-        <button class="nav-link" id="nav-Maintenance-Site-Operation-tab" data-bs-toggle="tab" data-bs-target="#nav-Maintenance-Site-Operation" type="button" role="tab" aria-controls="nav-Maintenance-Site-Operation" aria-selected="false">Maintenance Site Operation</button>
-        <button class="nav-link" id="nav-OutagesData-tab" data-bs-toggle="tab" data-bs-target="#nav-OutagesData" type="button" role="tab" aria-controls="nav-OutagesData" aria-selected="false" >OutagesData</button>
-      </div>
-    </nav>
-    <div class="tab-content" id="nav-tabContent">
-        <div class="container tab-pane fade show active" id="nav-Towers" role="tabpanel" aria-labelledby="nav-Towers-tab" tabindex="0">
-           <div id="tableDiv-Towers">
-        </div>
-     </div>
-      <div class="container tab-pane fade" id="nav-HPMS-Tickets" role="tabpanel" aria-labelledby="nav-HPMS-Tickets-tab" tabindex="0">
-        <div id="tableDiv-HPSMTickets">
-        </div>
-      </div>
-      <div class="tab-pane fade" id="nav-Maintenance-Site-Operation" role="tabpanel" aria-labelledby="nav-Maintenance-Site-Operation-tab" tabindex="0">
-        <div id="tableDiv-MaintenanceSiteOperation">
-        </div>
-      </div>
-      <div class="tab-pane fade" id="nav-OutagesData" role="tabpanel" aria-labelledby="nav-OutagesData-tab" tabindex="0">
-        <div id="tableDiv-OutagesData">
-        </div>
-      </div>
-    </div>
-    <script src="./bootstrap-5.2.3-dist/js/bootstrap.bundle.min.js" integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4" crossorigin="anonymous"></script>
-    <script src="https://unpkg.com/@esri/arcgis-rest-request@4.0.0/dist/bundled/request.umd.js"></script>
-    <script src="https://unpkg.com/@esri/arcgis-rest-feature-service@4.0.0/dist/bundled/feature-service.umd.js"></script>
-    <script src="https://js.arcgis.com/4.28/"></script>
-    <script type="module" src="https://js.arcgis.com/calcite-components/1.9.2/calcite.esm.js"></script>
-    <script
-    src="https://code.jquery.com/jquery-3.6.0.min.js"
-    integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
-    crossorigin="anonymous"></script>
     <script>
       require([
         "esri/WebMap",
@@ -83,718 +37,200 @@
         let selectionIdCount = 0; // The filtered selection id count
         let candidate; // The graphic accessed via the view.click event
 
+        let webmapId  = "f4f6642aa5514d83aae6de0ebb65057e";
+        if (window.location.href.indexOf("?id=") > 0) {
+          webmapId = window.location.href.split("?id=")[1];
+        }
+
         const webmap = new WebMap({
           portalItem: {
-            id: "f4f6642aa5514d83aae6de0ebb65057e"
+            id: webmapId
           }
         });
 
         const view = new MapView({
           container: "viewDiv",
           map: webmap,
+
         });
 
-        view.when(() => {
-          console.log(webmap.layers.getItemAt(8));
-          const featureLayerTwors = webmap.layers.getItemAt(8); // Grabs the first layer in the map
-          const featureLayerHPSMTickets = webmap.layers.getItemAt(7); // Grabs the first layer in the map
-          const featureLayerMaintenanceSiteOperation = new FeatureLayer({
-          url: "https://services3.arcgis.com/N0l9vjYH8GLn5HZh/arcgis/rest/services/Asia_Cell_V4/FeatureServer/4"
-          });
-          const featureLayerOutagesData = new FeatureLayer({
-          url: "https://services3.arcgis.com/N0l9vjYH8GLn5HZh/arcgis/rest/services/Asia_Cell_V4/FeatureServer/5"
-          });
-          featureLayerTwors.title = "Towers";
-          featureLayerHPSMTickets.title = "HPSM Tickets";
-          featureLayerMaintenanceSiteOperation.title = "Maintenance Site Operation";
-          featureLayerOutagesData.title = "OutagesData";
+      //   view.when(() => {
+      //     const featureLayer = webmap.layers.getItemAt(8); // Grabs the first layer in the map
+      //     featureLayer.title = "USFS Recreational areas";
 
-          // Create the feature table
-          const featureTableTwors = new FeatureTable({
-            view: view, // Required for feature highlight to work
-            layer: featureLayerTwors,
-            visibleElements: {
-              // Autocast to VisibleElements
-              menuItems: {
-                clearSelection: true,
-                refreshData: true,
-                toggleColumns: true,
-                selectedRecordsShowAllToggle: true,
-                selectedRecordsShowSelectedToggle: true,
-                zoomToSelection: true
-              }
-            },
-            tableTemplate: {
-              // Autocast to TableTemplate
-              columnTemplates: [
-                // Takes an array of FieldColumnTemplate and GroupColumnTemplate
-                {
-                  // Autocast to FieldColumnTemplate.
-                  type: "field",
-                  fieldName: "site_id",
-                  label: "Site ID",
-                  // direction: "des"
-                },
-                {
-                  type: "field",
-                  fieldName: "site_name",
-                  label: "Site Name"
-                },
-                {
-                  type: "field",
-                  fieldName: "latitude",
-                  label: "Latitude"
-                },
-                {
-                  type: "field",
-                  fieldName: "longitude",
-                  label: "Longitude"
-                },
-                {
-                  type: "field",
-                  fieldName: "total_no_customer",
-                  label: "total_no_customer"
-                }
-                ,
-                {
-                  type: "field",
-                  fieldName: "site_type",
-                  label: "Site type"
-                }
-                ,
-                {
-                  type: "field",
-                  fieldName: "maintenance",
-                  label: "maintenance"
-                }
-                ,
-                {
-                  type: "field",
-                  fieldName: "outages",
-                  label: "outages"
-                }
-                ,
-                {
-                  type: "field",
-                  fieldName: "gov",
-                  label: "gov"
-                }
-                ,
-                {
-                  type: "field",
-                  fieldName: "MaintenanceSiteOperation",
-                  label: "MaintenanceSiteOperation"
-                }
-                ,
-                {
-                  type: "field",
-                  fieldName: "OutagesData",
-                  label: "OutagesData"
-                }
-                ,
-                {
-                  type: "field",
-                  fieldName: "Sites_Buffer3",
-                  label: "Sites_Buffer3"
-                }
-                ,
-                {
-                  type: "field",
-                  fieldName: "CCTicketsFC",
-                  label: "CCTicketsFC"
-                }
-              ]
-            },
-            container: document.getElementById("tableDiv-Towers")
-          });
-          // Create the feature table
-          const featureTableHPSMTickets = new FeatureTable({
-            view: view, // Required for feature highlight to work
-            layer: featureLayerHPSMTickets,
-            visibleElements: {
-              // Autocast to VisibleElements
-              menuItems: {
-                clearSelection: true,
-                refreshData: true,
-                toggleColumns: true,
-                selectedRecordsShowAllToggle: true,
-                selectedRecordsShowSelectedToggle: true,
-                zoomToSelection: true
-              }
-            },
-            tableTemplate: {
-              // Autocast to TableTemplate
-              columnTemplates: [
-                // Takes an array of FieldColumnTemplate and GroupColumnTemplate
-                {
-                  // Autocast to FieldColumnTemplate.
-                  type: "field",
-                  fieldName: "im_id",
-                  label: "im_id",
-                  // direction: "des"
-                },
-                {
-                  type: "field",
-                  fieldName: "phone_number",
-                  label: "phone_number"
-                },
-                {
-                  type: "field",
-                  fieldName: "sd_id",
-                  label: "sd_id"
-                },
-                {
-                  type: "field",
-                  fieldName: "sd_open_time",
-                  label: "sd_open_time"
-                },
-                {
-                  type: "field",
-                  fieldName: "sd_opened_by",
-                  label: "sd_opened_by"
-                }
-                ,
-                {
-                  type: "field",
-                  fieldName: "sd",
-                  label: "sd"
-                }
-                ,
-                {
-                  type: "field",
-                  fieldName: "sd_status",
-                  label: "sd_status"
-                }
-                ,
-                {
-                  type: "field",
-                  fieldName: "area",
-                  label: "area"
-                }
-                ,
-                {
-                  type: "field",
-                  fieldName: "subcategory",
-                  label: "subcategory"
-                }
-                ,
-                {
-                  type: "field",
-                  fieldName: "sd_close_time",
-                  label: "sd_close_time"
-                }
-                ,
-                {
-                  type: "field",
-                  fieldName: "sd_resolution_time",
-                  label: "sd_resolution_time"
-                }
-                ,
-                {
-                  type: "field",
-                  fieldName: "general_outage",
-                  label: "general_outage"
-                }
-                ,
-                {
-                  type: "field",
-                  fieldName: "sla_status",
-                  label: "sla_status"
-                }
-                ,
-                {
-                  type: "field",
-                  fieldName: "affected_service",
-                  label: "affected_service"
-                }
-                ,
-                {
-                  type: "field",
-                  fieldName: "gouvernorate",
-                  label: "gouvernorate"
-                }
-                ,
-                {
-                  type: "field",
-                  fieldName: "resolution",
-                  label: "resolution"
-                }
-                ,
-                {
-                  type: "field",
-                  fieldName: "resolution_code",
-                  label: "resolution_code"
-                }
-                ,
-                {
-                  type: "field",
-                  fieldName: "cell_id",
-                  label: "cell_id"
-                }
-                ,
-                {
-                  type: "field",
-                  fieldName: "cell_name",
-                  label: "cell_name"
-                }
-                ,
-                {
-                  type: "field",
-                  fieldName: "siteid",
-                  label: "siteid"
-                }
-                ,
-                {
-                  type: "field",
-                  fieldName: "customer_segment",
-                  label: "customer_segment"
-                }
-                ,
-                {
-                  type: "field",
-                  fieldName: "sitename",
-                  label: "sitename"
-                }
-                ,
-                {
-                  type: "field",
-                  fieldName: "reopened",
-                  label: "reopened"
-                }
-                ,
-                {
-                  type: "field",
-                  fieldName: "resolved_by",
-                  label: "resolved_by"
-                }
-                ,
-                {
-                  type: "field",
-                  fieldName: "region",
-                  label: "region"
-                }
-                ,
-                {
-                  type: "field",
-                  fieldName: "resolved_by",
-                  label: "resolved_by"
-                }
-                ,
-                {
-                  type: "field",
-                  fieldName: "expected_resolution_date",
-                  label: "expected_resolution_date"
-                }
-              ]
-            },
-            container: document.getElementById("tableDiv-HPSMTickets")
-          });
-          const featureTableMaintenanceSiteOperation = new FeatureTable({
-            view: view, // Required for feature highlight to work
-            layer: featureLayerMaintenanceSiteOperation,
-            visibleElements: {
-              // Autocast to VisibleElements
-              menuItems: {
-                clearSelection: true,
-                refreshData: true,
-                toggleColumns: true,
-                selectedRecordsShowAllToggle: true,
-                selectedRecordsShowSelectedToggle: true,
-                zoomToSelection: true
-              }
-            },
-            tableTemplate: {
-              // Autocast to TableTemplate
-              columnTemplates: [
-                // Takes an array of FieldColumnTemplate and GroupColumnTemplate
-                {
-                  // Autocast to FieldColumnTemplate.
-                  type: "field",
-                  fieldName: "operation_id",
-                  label: "operation_id",
-                  // direction: "des"
-                },
-                {
-                  type: "field",
-                  fieldName: "operation_name",
-                  label: "operation_name"
-                },
-                {
-                  type: "field",
-                  fieldName: "operation_category",
-                  label: "operation_category"
-                },
-                {
-                  type: "field",
-                  fieldName: "peration_date",
-                  label: "peration_date"
-                },
-                {
-                  type: "field",
-                  fieldName: "site_id",
-                  label: "site_id"
-                }
-                ,
-                {
-                  type: "field",
-                  fieldName: "status",
-                  label: "status"
-                }
-                ,
-                {
-                  type: "field",
-                  fieldName: "cell_id",
-                  label: "cell_id"
-                }
-              ]
-            },
-            container: document.getElementById("tableDiv-MaintenanceSiteOperation")
-          });
-          const featureTableOutagesData = new FeatureTable({
-            view: view, // Required for feature highlight to work
-            layer: featureLayerOutagesData,
-            visibleElements: {
-              // Autocast to VisibleElements
-              menuItems: {
-                clearSelection: true,
-                refreshData: true,
-                toggleColumns: true,
-                selectedRecordsShowAllToggle: true,
-                selectedRecordsShowSelectedToggle: true,
-                zoomToSelection: true
-              }
-            },
-            tableTemplate: {
-              // Autocast to TableTemplate
-              columnTemplates: [
-                // Takes an array of FieldColumnTemplate and GroupColumnTemplate
-                {
-                  // Autocast to FieldColumnTemplate.
-                  type: "field",
-                  fieldName: "incident_id",
-                  label: "incident_id",
-                  // direction: "des"
-                },
-                {
-                  type: "field",
-                  fieldName: "status",
-                  label: "status"
-                },
-                {
-                  type: "field",
-                  fieldName: "kpi_category",
-                  label: "kpi_category"
-                },
-                {
-                  type: "field",
-                  fieldName: "kpi_subcategory",
-                  label: "kpi_subcategory"
-                },
-                {
-                  type: "field",
-                  fieldName: "assignment",
-                  label: "assignment"
-                }
-                ,
-                {
-                  type: "field",
-                  fieldName: "cluster",
-                  label: "cluster"
-                }
-                ,
-                {
-                  type: "field",
-                  fieldName: "element",
-                  label: "element"
-                }
-                ,
-                {
-                  type: "field",
-                  fieldName: "province_city",
-                  label: "province_city"
-                }
-                ,
-                {
-                  type: "field",
-                  fieldName: "ne_name",
-                  label: "ne_name"
-                }
-                ,
-                {
-                  type: "field",
-                  fieldName: "affectedobject",
-                  label: "affectedobject"
-                }
-                ,
-                {
-                  type: "field",
-                  fieldName: "site_id",
-                  label: "site_id"
-                }
-                ,
-                {
-                  type: "field",
-                  fieldName: "site_name",
-                  label: "site_name"
-                }
-                ,
-                {
-                  type: "field",
-                  fieldName: "original_event_time",
-                  label: "original_event_time"
-                }
-                ,
-                {
-                  type: "field",
-                  fieldName: "clearance_time",
-                  label: "clearance_time"
-                }
-                ,
-                {
-                  type: "field",
-                  fieldName: "close_time",
-                  label: "close_time"
-                }
-                ,
-                {
-                  type: "field",
-                  fieldName: "duration",
-                  label: "duration"
-                }
-                ,
-                {
-                  type: "field",
-                  fieldName: "open_time",
-                  label: "open_time"
-                }
-                ,
-                {
-                  type: "field",
-                  fieldName: "alarm_number",
-                  label: "alarm_number"
-                }
-                ,
-                {
-                  type: "field",
-                  fieldName: "alarm_severity",
-                  label: "alarm_severity"
-                }
-                ,
-                {
-                  type: "field",
-                  fieldName: "affected_sector",
-                  label: "affected_sector"
-                }
-                ,
-                {
-                  type: "field",
-                  fieldName: "problem_category",
-                  label: "problem_category"
-                }
-                ,
-                {
-                  type: "field",
-                  fieldName: "reason",
-                  label: "reason"
-                }
-                ,
-                {
-                  type: "field",
-                  fieldName: "service_affected",
-                  label: "service_affected"
-                }
-                ,
-                {
-                  type: "field",
-                  fieldName: "resolution_code",
-                  label: "resolution_code"
-                }
-                ,
-                {
-                  type: "field",
-                  fieldName: "notification_id",
-                  label: "notification_id"
-                }
-                ,
-                {
-                  type: "field",
-                  fieldName: "resolution",
-                  label: "resolution"
-                }
-                ,
-                {
-                  type: "field",
-                  fieldName: "update_time",
-                  label: "update_time"
-                }
-              ]
-            },
-            container: document.getElementById("tableDiv-OutagesData")
-          });
+      //     // Create the feature table
+      //     const featureTable = new FeatureTable({
+      //       view: view, // Required for feature highlight to work
+      //       layer: featureLayer,
+      //       visibleElements: {
+      //         // Autocast to VisibleElements
+      //         menuItems: {
+      //           clearSelection: true,
+      //           refreshData: true,
+      //           toggleColumns: true,
+      //           selectedRecordsShowAllToggle: true,
+      //           selectedRecordsShowSelectedToggle: true,
+      //           zoomToSelection: true
+      //         }
+      //       },
+      //       tableTemplate: {
+      //         // Autocast to TableTemplate
+      //         columnTemplates: [
+      //           // Takes an array of FieldColumnTemplate and GroupColumnTemplate
+      //           {
+      //    // Autocast to FieldColumnTemplate.
+      //    type: "field",
+      //    fieldName: "site_id",
+      //    label: "Site ID",
+      //    // direction: "des"
+      //  },
+      //  {
+      //    type: "field",
+      //    fieldName: "site_name",
+      //    label: "Site Name"
+      //  },
+      //  // {
+      //  //   type: "field",
+      //  //   fieldName: "latitude",
+      //  //   label: "Latitude"
+      //  // },
+      //  // {
+      //  //   type: "field",
+      //  //   fieldName: "longitude",
+      //  //   label: "Longitude"
+      //  // },
+      //  {
+      //    type: "field",
+      //    fieldName: "total_no_customer",
+      //    label: "total_no_customer"
+      //  }
+      //  ,
+      //  {
+      //    type: "field",
+      //    fieldName: "site_type",
+      //    label: "Site type"
+      //  }
+      //  ,
+      //  {
+      //    type: "field",
+      //    fieldName: "maintenance",
+      //    label: "maintenance"
+      //  }
+      //  ,
+      //  {
+      //    type: "field",
+      //    fieldName: "outages",
+      //    label: "outages"
+      //  }
+      //  ,
+      //  {
+      //    type: "field",
+      //    fieldName: "gov",
+      //    label: "gov"
+      //  }
+      //  ,
+      //  {
+      //    type: "field",
+      //    fieldName: "MaintenanceSiteOperation",
+      //    label: "MaintenanceSiteOperation"
+      //  }
+      //  ,
+      //  {
+      //    type: "field",
+      //    fieldName: "OutagesData",
+      //    label: "OutagesData"
+      //  }
+      //  ,
+      //  {
+      //    type: "field",
+      //    fieldName: "Sites_Buffer3",
+      //    label: "Sites_Buffer3"
+      //  }
+      //  ,
+      //  {
+      //    type: "field",
+      //    fieldName: "CCTicketsFC",
+      //    label: "CCTicketsFC"
+      //  }
+      //         ]
+      //       },
+      //       container: document.getElementById("tableDiv")
+      //     });
 
-          // Listen for when the view is stationary.
-          // If true, set the table to display only the attributes
-          // for the features falling within this extent.
+      //     // Listen for when the view is stationary.
+      //     // If true, set the table to display only the attributes
+      //     // for the features falling within this extent.
 
-          reactiveUtils.when(
-            () => view.stationary,
-            () => {
-              // Filter out and show only the visible features in the feature table.
-              featureTableTwors.filterGeometry = view.extent;
-              featureTableHPSMTickets.filterGeometry = view.extent;
-              featureTableMaintenanceSiteOperation.filterGeometry = view.extent;
-              featureTableOutagesData.filterGeometry = view.extent;
-            },
-            {
-              initial: true
-            }
-          );
+      //     reactiveUtils.when(
+      //       () => view.stationary,
+      //       () => {
+      //         // Filter out and show only the visible features in the feature table.
+      //         featureTable.filterGeometry = view.extent;
+      //       },
+      //       {
+      //         initial: true
+      //       }
+      //     );
 
-          // Listen for the view's click event and access the associated graphic.
+      //     // Listen for the view's click event and access the associated graphic.
 
-          view.on("immediate-click", async (event) => {
-            const response = await view.hitTest(event);
+      //     view.on("immediate-click", async (event) => {
+      //       const response = await view.hitTest(event);
 
-            candidate = response.results.find((result) => {
-              return result.graphic &&
-               result.graphic.layer &&
-                result.graphic.layer === featureLayerTwors &&
-                 result.graphic.layer === featureLayerHPSMTickets &&
-                  result.graphic.layer === featureLayerMaintenanceSiteOperation &&
-                  result.graphic.layer === featureLayerOutagesData 
-            });
+      //       candidate = response.results.find((result) => {
+      //         return result.graphic && result.graphic.layer && result.graphic.layer === featureLayer;
+      //       });
 
-            // Add the graphic's ObjectId into the collection of highlightIds.
-            // Check that the featureTableTwors.highlightIds collection
-            // does not include an already highlighted feature.
-            if (candidate) {
-              const objectId = candidate.graphic.getObjectId();
+      //       // Add the graphic's ObjectId into the collection of highlightIds.
+      //       // Check that the featureTable.highlightIds collection
+      //       // does not include an already highlighted feature.
+      //       if (candidate) {
+      //         const objectId = candidate.graphic.getObjectId();
 
-              if (featureTableTwors.highlightIds.includes(objectId)) {
-                // Remove feature from current selection if feature
-                // is already added to highlightIds collection
-                featureTableTwors.highlightIds.remove(objectId);
-              } else {
-                // Add this feature to the featureTableTwors highlightIds collection
-                featureTableTwors.highlightIds.add(objectId);
-              }
+      //         if (featureTable.highlightIds.includes(objectId)) {
+      //           // Remove feature from current selection if feature
+      //           // is already added to highlightIds collection
+      //           featureTable.highlightIds.remove(objectId);
+      //         } else {
+      //           // Add this feature to the featureTable highlightIds collection
+      //           featureTable.highlightIds.add(objectId);
+      //         }
+      //       }
+      //     });
 
-              if (featureTableHPSMTickets.highlightIds.includes(objectId)) {
-                // Remove feature from current selection if feature
-                // is already added to highlightIds collection
-                featureTableHPSMTickets.highlightIds.remove(objectId);
-              } else {
-                // Add this feature to the featureTableHPSMTickets highlightIds collection
-                featureTableHPSMTickets.highlightIds.add(objectId);
-              }
+      //     // Watch the featureTable's highlightIds.length property,
+      //     // and get the count of highlighted features within
+      //     // the table.
 
-              if (featureTableMaintenanceSiteOperation.highlightIds.includes(objectId)) {
-                // Remove feature from current selection if feature
-                // is already added to highlightIds collection
-                featureTableMaintenanceSiteOperation.highlightIds.remove(objectId);
-              } else {
-                // Add this feature to the featureTableOutagesData highlightIds collection
-                featureTableMaintenanceSiteOperation.highlightIds.add(objectId);
-              }
+      //     reactiveUtils.watch(
+      //       () => featureTable.highlightIds.length,
+      //       (highlightIdsCount) => {
+      //         // Iterate through the filters within the table.
+      //         // If the active filter is "Show selection",
+      //         // changes made to highlightIds (adding/removing)
+      //         // are reflected.
 
-              if (featureTableOutagesData.highlightIds.includes(objectId)) {
-                // Remove feature from current selection if feature
-                // is already added to highlightIds collection
-                featureTableOutagesData.highlightIds.remove(objectId);
-              } else {
-                // Add this feature to the featureTableOutagesData highlightIds collection
-                featureTableOutagesData.highlightIds.add(objectId);
-              }
-            }
-          });
-
-          // Watch the featureTableTwors's highlightIds.length property,
-          // and get the count of highlighted features within
-          // the table.
-
-          reactiveUtils.watch(
-            () => featureTableTwors.highlightIds.length,
-            (highlightIdsCount) => {
-              // Iterate through the filters within the table.
-              // If the active filter is "Show selection",
-              // changes made to highlightIds (adding/removing)
-              // are reflected.
-
-              featureTableTwors.viewModel.activeFilters.forEach((filter) => {
-                if (filter.type === "selection") {
-                  selectionIdCount = filter.objectIds.length; // the filtered selection's id count
-                  // Check that the filter selection count is equal to the
-                  // highlightIds collection count. If not, update filter selection.
-                  if (selectionIdCount !== highlightIdsCount) {
-                    featureTableTwors.filterBySelection();
-                  }
-                }
-              });
-            }
-          );
-
-          reactiveUtils.watch(
-            () => featureTableHPSMTickets.highlightIds.length,
-            (highlightIdsCount) => {
-              // Iterate through the filters within the table.
-              // If the active filter is "Show selection",
-              // changes made to highlightIds (adding/removing)
-              // are reflected.
-
-              featureTableHPSMTickets.viewModel.activeFilters.forEach((filter) => {
-                if (filter.type === "selection") {
-                  selectionIdCount = filter.objectIds.length; // the filtered selection's id count
-                  // Check that the filter selection count is equal to the
-                  // highlightIds collection count. If not, update filter selection.
-                  if (selectionIdCount !== highlightIdsCount) {
-                    featureTableHPSMTickets.filterBySelection();
-                  }
-                }
-              });
-            }
-          );
-          reactiveUtils.watch(
-            () => featureTableMaintenanceSiteOperation.highlightIds.length,
-            (highlightIdsCount) => {
-              // Iterate through the filters within the table.
-              // If the active filter is "Show selection",
-              // changes made to highlightIds (adding/removing)
-              // are reflected.
-
-              featureTableMaintenanceSiteOperation.viewModel.activeFilters.forEach((filter) => {
-                if (filter.type === "selection") {
-                  selectionIdCount = filter.objectIds.length; // the filtered selection's id count
-                  // Check that the filter selection count is equal to the
-                  // highlightIds collection count. If not, update filter selection.
-                  if (selectionIdCount !== highlightIdsCount) {
-                    featureTableMaintenanceSiteOperation.filterBySelection();
-                  }
-                }
-              });
-            }
-          );
-          reactiveUtils.watch(
-            () => featureTableOutagesData.highlightIds.length,
-            (highlightIdsCount) => {
-              // Iterate through the filters within the table.
-              // If the active filter is "Show selection",
-              // changes made to highlightIds (adding/removing)
-              // are reflected.
-
-              featureTableOutagesData.viewModel.activeFilters.forEach((filter) => {
-                if (filter.type === "selection") {
-                  selectionIdCount = filter.objectIds.length; // the filtered selection's id count
-                  // Check that the filter selection count is equal to the
-                  // highlightIds collection count. If not, update filter selection.
-                  if (selectionIdCount !== highlightIdsCount) {
-                    featureTableOutagesData.filterBySelection();
-                  }
-                }
-              });
-            }
-          );
-        });
+      //         featureTable.viewModel.activeFilters.forEach((filter) => {
+      //           if (filter.type === "selection") {
+      //             selectionIdCount = filter.objectIds.length; // the filtered selection's id count
+      //             // Check that the filter selection count is equal to the
+      //             // highlightIds collection count. If not, update filter selection.
+      //             if (selectionIdCount !== highlightIdsCount) {
+      //               featureTable.filterBySelection();
+      //             }
+      //           }
+      //         });
+      //       }
+      //     );
+      //   });
       });
     </script>
+  </head>
+
+  <body>
+    <div id="viewDiv"></div>
+    <div class="container">
+      <div id="tableDiv"></div>
+    </div>
   </body>
 </html>
