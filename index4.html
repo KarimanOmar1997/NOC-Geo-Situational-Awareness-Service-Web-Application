@@ -1,236 +1,173 @@
-<html lang="en">
+<!DOCTYPE html>
+<html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="initial-scale=1, maximum-scale=1,user-scalable=no" />
-    <title>FeatureTable with a map | Sample | ArcGIS Maps SDK for JavaScript 4.28</title>
+    <meta
+      name="viewport"
+      content="initial-scale=1,maximum-scale=1,user-scalable=no"
+    />
 
-    <link rel="stylesheet" href="https://js.arcgis.com/4.28/esri/themes/light/main.css" />
+    <title>
+      ArcGIS Developer Guide: Predominance educational attainment
+    </title>
+
+    <link
+      rel="stylesheet"
+      href="https://js.arcgis.com/4.28/esri/themes/light/main.css"
+    />
     <script src="https://js.arcgis.com/4.28/"></script>
 
     <style>
       html,
-      body {
-        height: 100%;
-        width: 100%;
-        margin: 0;
-        padding: 0;
-      }
-
+      body,
       #viewDiv {
-        height: 50%;
-        width: 100%;
-      }
-
-      .container {
-        height: 50%;
+        padding: 0;
+        margin: 0;
+        height: 100%;
         width: 100%;
       }
     </style>
+
+    <!--ARCADE SCRIPTS-->
+
+    <!--PREDOMINANT POLITICAL PARTY-->
+
+    <script type="text/plain" id="predominance">
+
+      // store field values in variables with
+      // meaningful names. Each is the total count
+      // of people that attained each education level
+
+      var noHighSchool = $feature.NOHS_CY;
+      var someHighSchool = $feature.SOMEHS_CY;
+      var highSchool = $feature.HSGRAD_CY;
+      var ged = $feature.GED_CY;
+      var someCollege = $feature.SMCOLL_CY;
+      var associates = $feature.ASSCDEG_CY;
+      var bachelors = $feature.BACHDEG_CY;
+      var grad = $feature.GRADDEG_CY;
+
+      var all = [
+        noHighSchool, someHighSchool, highSchool,
+        ged, someCollege, associates,
+        bachelors, grad,
+      ];
+
+      // Match the maximum value with the label
+      // of the respective field and return it for
+      // use in a UniqueValueRenderer
+
+      return Decode( Max(all),
+        noHighSchool, 'No high school',
+        someHighSchool, 'Some high school',
+        highSchool, 'High school diploma',
+        ged, 'GED',
+        someCollege, 'Some college',
+        associates, 'Associate\'s degree',
+        bachelors, 'Bachelor\'s degree',
+        grad, 'Master\'s degree or higher',
+      'n/a' );
+
+    </script>
+
     <script>
       require([
+        "esri/config",
         "esri/WebMap",
         "esri/views/MapView",
-        "esri/core/reactiveUtils",
         "esri/layers/FeatureLayer",
-        "esri/widgets/FeatureTable"
-      ], (WebMap, MapView, reactiveUtils, FeatureLayer, FeatureTable) => {
-        let selectionIdCount = 0; // The filtered selection id count
-        let candidate; // The graphic accessed via the view.click event
+        "esri/widgets/Legend",
+        "esri/widgets/Expand"
+      ], function (esriConfig,WebMap, MapView, FeatureLayer, Legend, Expand) {
 
-        let webmapId  = "f4f6642aa5514d83aae6de0ebb65057e";
-        if (window.location.href.indexOf("?id=") > 0) {
-          webmapId = window.location.href.split("?id=")[1];
+        esriConfig.apiKey = "AAPK8439fc9a325c4593a3234a4fbafe73caXK2STpUubI24-8zi9egsX2fCBrOdoOUY5qDXEAIHWamfxipss0ffj3zCLo7amIE6";
+
+        function createSymbol(color) {
+          return {
+            type: "simple-fill",
+            color: color,
+            outline: {
+              width: 0.3,
+              color: [255, 255, 255, 0.2]
+            }
+          };
         }
 
-        const webmap = new WebMap({
+
+        const colors = [ "#00b6f1", "#d9bf0d", "#6a28c7", "#c44245", "#b9a087", "#ab579d", "#78aea0", "#1e8553" ];
+        const predominanceArcade = document.getElementById("predominance").text;
+        const renderer = {
+          type: "unique-value",
+          valueExpression: predominanceArcade,
+          valueExpressionTitle: "Predominant educational attainment",
+          uniqueValueInfos: [
+            {
+              value: "Master's degree or higher",
+              symbol: createSymbol(colors[0])
+            }, {
+              value: "Bachelor's degree",
+              symbol: createSymbol(colors[1])
+            }, {
+              value: "Associate's degree",
+              symbol: createSymbol(colors[2])
+            }, {
+              value: "Some college",
+              symbol: createSymbol(colors[3])
+            }, {
+              value: "GED",
+              symbol: createSymbol(colors[4])
+            }, {
+              value: "High school diploma",
+              symbol: createSymbol(colors[5])
+            }, {
+              value: "Some high school",
+              symbol: createSymbol(colors[6])
+            }, {
+              value: "No high school",
+              symbol: createSymbol(colors[7])
+            }
+          ]
+        };
+
+
+        const layer = new FeatureLayer({
           portalItem: {
-            id: webmapId
-          }
+            id: "1cbb0faa0f1f424bbe213bfae9319309"
+          },
+          renderer: renderer,
+          blendMode: "multiply"
+        });
+
+        const map = new WebMap({
+          portalItem: {
+            id: "9cf503b654144873a8e33f996f91ba1d"
+          },
+          layers: [ layer ]
         });
 
         const view = new MapView({
           container: "viewDiv",
-          map: webmap,
-
+          map: map,
+          scale: 577790,
+          center: [ -117.8099, 34.0441 ],
+          constraints: {
+            snapToZoom:false
+          }
         });
 
-      //   view.when(() => {
-      //     const featureLayer = webmap.layers.getItemAt(8); // Grabs the first layer in the map
-      //     featureLayer.title = "USFS Recreational areas";
+        view.ui.add(new Expand({
+          content: new Legend({
+            view: view
+          }),
+          view: view,
+          expanded: false
+        }), "top-right");
 
-      //     // Create the feature table
-      //     const featureTable = new FeatureTable({
-      //       view: view, // Required for feature highlight to work
-      //       layer: featureLayer,
-      //       visibleElements: {
-      //         // Autocast to VisibleElements
-      //         menuItems: {
-      //           clearSelection: true,
-      //           refreshData: true,
-      //           toggleColumns: true,
-      //           selectedRecordsShowAllToggle: true,
-      //           selectedRecordsShowSelectedToggle: true,
-      //           zoomToSelection: true
-      //         }
-      //       },
-      //       tableTemplate: {
-      //         // Autocast to TableTemplate
-      //         columnTemplates: [
-      //           // Takes an array of FieldColumnTemplate and GroupColumnTemplate
-      //           {
-      //    // Autocast to FieldColumnTemplate.
-      //    type: "field",
-      //    fieldName: "site_id",
-      //    label: "Site ID",
-      //    // direction: "des"
-      //  },
-      //  {
-      //    type: "field",
-      //    fieldName: "site_name",
-      //    label: "Site Name"
-      //  },
-      //  // {
-      //  //   type: "field",
-      //  //   fieldName: "latitude",
-      //  //   label: "Latitude"
-      //  // },
-      //  // {
-      //  //   type: "field",
-      //  //   fieldName: "longitude",
-      //  //   label: "Longitude"
-      //  // },
-      //  {
-      //    type: "field",
-      //    fieldName: "total_no_customer",
-      //    label: "total_no_customer"
-      //  }
-      //  ,
-      //  {
-      //    type: "field",
-      //    fieldName: "site_type",
-      //    label: "Site type"
-      //  }
-      //  ,
-      //  {
-      //    type: "field",
-      //    fieldName: "maintenance",
-      //    label: "maintenance"
-      //  }
-      //  ,
-      //  {
-      //    type: "field",
-      //    fieldName: "outages",
-      //    label: "outages"
-      //  }
-      //  ,
-      //  {
-      //    type: "field",
-      //    fieldName: "gov",
-      //    label: "gov"
-      //  }
-      //  ,
-      //  {
-      //    type: "field",
-      //    fieldName: "MaintenanceSiteOperation",
-      //    label: "MaintenanceSiteOperation"
-      //  }
-      //  ,
-      //  {
-      //    type: "field",
-      //    fieldName: "OutagesData",
-      //    label: "OutagesData"
-      //  }
-      //  ,
-      //  {
-      //    type: "field",
-      //    fieldName: "Sites_Buffer3",
-      //    label: "Sites_Buffer3"
-      //  }
-      //  ,
-      //  {
-      //    type: "field",
-      //    fieldName: "CCTicketsFC",
-      //    label: "CCTicketsFC"
-      //  }
-      //         ]
-      //       },
-      //       container: document.getElementById("tableDiv")
-      //     });
-
-      //     // Listen for when the view is stationary.
-      //     // If true, set the table to display only the attributes
-      //     // for the features falling within this extent.
-
-      //     reactiveUtils.when(
-      //       () => view.stationary,
-      //       () => {
-      //         // Filter out and show only the visible features in the feature table.
-      //         featureTable.filterGeometry = view.extent;
-      //       },
-      //       {
-      //         initial: true
-      //       }
-      //     );
-
-      //     // Listen for the view's click event and access the associated graphic.
-
-      //     view.on("immediate-click", async (event) => {
-      //       const response = await view.hitTest(event);
-
-      //       candidate = response.results.find((result) => {
-      //         return result.graphic && result.graphic.layer && result.graphic.layer === featureLayer;
-      //       });
-
-      //       // Add the graphic's ObjectId into the collection of highlightIds.
-      //       // Check that the featureTable.highlightIds collection
-      //       // does not include an already highlighted feature.
-      //       if (candidate) {
-      //         const objectId = candidate.graphic.getObjectId();
-
-      //         if (featureTable.highlightIds.includes(objectId)) {
-      //           // Remove feature from current selection if feature
-      //           // is already added to highlightIds collection
-      //           featureTable.highlightIds.remove(objectId);
-      //         } else {
-      //           // Add this feature to the featureTable highlightIds collection
-      //           featureTable.highlightIds.add(objectId);
-      //         }
-      //       }
-      //     });
-
-      //     // Watch the featureTable's highlightIds.length property,
-      //     // and get the count of highlighted features within
-      //     // the table.
-
-      //     reactiveUtils.watch(
-      //       () => featureTable.highlightIds.length,
-      //       (highlightIdsCount) => {
-      //         // Iterate through the filters within the table.
-      //         // If the active filter is "Show selection",
-      //         // changes made to highlightIds (adding/removing)
-      //         // are reflected.
-
-      //         featureTable.viewModel.activeFilters.forEach((filter) => {
-      //           if (filter.type === "selection") {
-      //             selectionIdCount = filter.objectIds.length; // the filtered selection's id count
-      //             // Check that the filter selection count is equal to the
-      //             // highlightIds collection count. If not, update filter selection.
-      //             if (selectionIdCount !== highlightIdsCount) {
-      //               featureTable.filterBySelection();
-      //             }
-      //           }
-      //         });
-      //       }
-      //     );
-      //   });
       });
     </script>
   </head>
 
   <body>
     <div id="viewDiv"></div>
-    <div class="container">
-      <div id="tableDiv"></div>
-    </div>
   </body>
 </html>

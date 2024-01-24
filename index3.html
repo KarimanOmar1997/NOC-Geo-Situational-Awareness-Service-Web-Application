@@ -1,330 +1,188 @@
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
-    <title>Timestamp-offset field | Sample | ArcGIS Maps SDK for JavaScript 4.28</title>
+<!--
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.4.0/Chart.min.js"></script>
-    <script type="module" src="https://js.arcgis.com/calcite-components/1.9.2/calcite.esm.js"></script>
-    <link rel="stylesheet" type="text/css" href="https://js.arcgis.com/calcite-components/1.9.2/calcite.css"/>
-    <link rel="stylesheet" href="https://js.arcgis.com/4.28/esri/themes/light/main.css" />
-    <script src="https://js.arcgis.com/4.28/"></script>
+To run this demo, you need to replace 'YOUR_API_KEY' with an API key from the ArcGIS Developers dashboard.
 
-    <style>
-      html,
-      body,
-      #viewDiv {
-        padding: 0;
-        margin: 0;
-        height: 100%;
-        width: 100%;
-      }
-      #rightPanel {
-        max-height: 98%;
-      }
+Sign up for a free account and get an API key.
 
-      
-      calcite-shell{
-            position: relative;
-            height: 100vh;
-          }
+https://developers.arcgis.com/documentation/mapping-apis-and-services/get-started/
 
-      calcite-shell-panel {
-        --calcite-shell-panel-min-width: 420px;
-        --calcite-shell-panel-width: 420px;
-        --calcite-shell-panel-max-width: 80%;
-      }
+-->
 
-      calcite-chip[selected] {
-        --calcite-ui-border-1: var(--calcite-ui-brand);
-      }
-
-      .canvas {
-        margin: 0 auto 1rem
-      }
-
-      calcite-chip-group {
-        margin: 1rem auto .5rem;
-      }
+<html>
+<head>
+  <meta name="description" content="Style a feature layer">
+  <meta charset="utf-8">
+  <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
+  <title>ArcGIS Maps SDK for JavaScript Tutorials: Style a feature layer</title>
+  <style>
+    html,
+    body,
+    #viewDiv {
+      padding: 0;
+      margin: 0;
+      height: 100%;
+      width: 100%;
+    }
   </style>
-   <script>
+  <link rel="stylesheet" href="https://js.arcgis.com/4.28/esri/themes/light/main.css">
+  <script src="https://js.arcgis.com/4.28/"></script>
+
+  <script>
+
     require([
+      "esri/config",
       "esri/Map",
       "esri/views/MapView",
-      "esri/layers/FeatureLayer",
-      "esri/widgets/Legend",
-      "esri/widgets/Expand",
-      "esri/WebMap",
-    ], (
-      Map,
-      MapView,
-      FeatureLayer,
-      Legend,
-      Expand,
-      WebMap
-    ) => (async () => {
-      let webmapId  = "f4f6642aa5514d83aae6de0ebb65057e";
-      if (window.location.href.indexOf("?id=") > 0) {
-        webmapId = window.location.href.split("?id=")[1];
-      }
-      const map = new WebMap({
-        portalItem: {
-          id: webmapId
-        }
+
+      "esri/layers/FeatureLayer"
+
+    ], function(esriConfig, Map, MapView, FeatureLayer ) {
+
+      esriConfig.apiKey = "AAPK8439fc9a325c4593a3234a4fbafe73caXK2STpUubI24-8zi9egsX2fCBrOdoOUY5qDXEAIHWamfxipss0ffj3zCLo7amIE6";
+
+      const map = new Map({
+        basemap: "arcgis/topographic" // basemap styles service
       });
-      
 
       const view = new MapView({
-        map: map,
         container: "viewDiv",
-        popupEnabled: false,
+        map: map,
+        center: [-118.80543,34.02700], //Longitude, latitude
+        zoom: 13
       });
 
-      // add fatal accidents of 2021 across USA
-      await map.when();
-      const layer = map.layers.getItemAt(7);
-      console.log(layer);
-      await layer.load();
-      let layerView = await view.whenLayerView(layer);
-
-      // prepare data for total accidents by time of day chart
-
-      // // Accidents by time of day chart
-      // // run stats query to return total number of accidents by time of day
-      // // stats results will be grouped by the time of day
-
-      // // create a bar chart showing total number of accidents by time of day
-
-
-
-      let charts = [],SDStatusData = [], SDStatusLabels = [];
-      // Accidents by time of day chart
-      // run stats query to return total number of accidents by time of day
-      // stats results will be grouped by the time of day
-      const SDStatusResult = await runQuery("1=1", "sd_status");
-      for (let feature of SDStatusResult.features) {
-        SDStatusData.push(feature.attributes["count"]);
-        console.log(feature.attributes);
-        SDStatusLabels.push(feature.attributes["sd_status"]);
+      const trailheadsRenderer = {
+        "type": "simple",
+        "symbol": {
+          "type": "picture-marker",
+          "url": "http://static.arcgis.com/images/Symbols/NPS/npsPictograph_0231b.png",
+          "width": "18px",
+          "height": "18px"
+        }
       }
 
-      // create a bar chart showing total number of accidents by time of day
-      updateChart("chart-SDStatus", SDStatusData, SDStatusLabels, false, 50);
+      const trailheadsLabels = {
+        symbol: {
+          type: "text",
+          color: "#FFFFFF",
+          haloColor: "#5E8D74",
+          haloSize: "2px",
+          font: {
+            size: "12px",
+            family: "Noto Sans",
+            style: "italic",
+            weight: "normal"
+          }
+        },
 
-      // this function is called 3 times when the app loads and generates
-      // count stats for accidents 1. by time of day 2. by day of week and 3. by month
-      async function runQuery(where, groupStats) {
-        // create a query object that honors the layer settings
-        let query = layer.createQuery();
-        query.where = where;
-        query.outStatistics = [
+        labelPlacement: "above-center",
+        labelExpressionInfo: {
+          expression: "$feature.TRL_NAME"
+        }
+      };
+
+      // Create the layer and set the renderer
+      const trailheads = new FeatureLayer({
+        url: "https://services3.arcgis.com/GVgbJbqm8hXASVYi/arcgis/rest/services/Trailheads/FeatureServer/0",
+        renderer: trailheadsRenderer,
+        labelingInfo: [trailheadsLabels]
+      });
+
+      map.add(trailheads);
+
+      // Define a unique value renderer and symbols
+      const trailsRenderer = {
+        type: "simple",
+        symbol: {
+          color: "#BA55D3",
+          type: "simple-line",
+          style: "solid"
+        },
+
+        visualVariables: [
           {
-            statisticType: "count",
-            onStatisticField: "*",
-            outStatisticFieldName: "count"
+            type: "size",
+            field: "ELEV_GAIN",
+            minDataValue: 0,
+            maxDataValue: 2300,
+            minSize: "3px",
+            maxSize: "7px"
           }
-        ];
-        query.groupByFieldsForStatistics = [groupStats];
-        query.orderByFields = [groupStats];
-        let result = await layer.queryFeatures(query);
-        return result;
-      }
+        ]
+      };
 
-      // Keeps track of a selected bar on monthly or week day chart
-      // We use this info to toggle the clicked bar color
-      let previouslySelectedBarIndex = null;
-
-      // this function is called when user hover the mouse over accidents charts.
-      // Accidents layer view feature effect will be updated to highlight features
-      // that fall within the selected time, week day or month
-      async function applyFilterToAccidentsSDStatus(event, chart) {
-        const activePoints = chart.getElementsAtEvent(event);
-        // user did not click on a bar. stop here.
-        if (activePoints.length == 0) {
-          return;
-        }
-        const chartData = activePoints[0]["_chart"].config.data;
-        const idx = activePoints[0]["_index"];
-
-        // There is a selected bar already. Clear up the previous selection before applying a new change
-        if (previouslySelectedBarIndex >= 0) {
-          // change the bar color back to blue
-          changeBarColor(chart, previouslySelectedBarIndex, "#007AC2");
-          // clear the feature effect and reset the previous index
-          if (previouslySelectedBarIndex === idx) {
-            previouslySelectedBarIndex = null;
-            layerView.featureEffect = undefined;
-
-          if (dayDistributionChart) {
-            dayDistributionChart.data.datasets[0].data = [];
-            dayDistributionChart.update();
-            dayChartBreakDownBlock.heading = "Click on the graph bar to see hourly chart";
-          }
-            return;
-          }
-        }
-
-        // feature effect will be applied based on the chart bar user clicked on
-        if (activePoints[0]) {
-          const label = chartData.labels[idx];
-
-          changeBarColor(chart, idx, "red");
-          previouslySelectedBarIndex = idx;
-          let where;
-          // apply effect to accidents happened during the selected hour
-
-            const queryValue = label;
-            where = `sd_status = '${queryValue}'`;
-          
-          layerView.featureEffect = {
-            filter: {
-              where
-            },
-            excludedEffect: "blur(2px) opacity(0.2) grayscale(0.2)"
-          };
-        }
-      }
-
-      async function dayDistributionStats(where, groupStats, label) {
-        const result = await runQuery(where, groupStats);
-        let chartData = [], chartLabels = [];
-
-        for (let feature of result.features) {
-          chartData.push(feature.attributes["count"]);
-          chartLabels.push(feature.attributes["EXPR_1"]);
-        }
-
-        if (dayChartBreakDownBlock.style.display === "none") {
-          dayChartBreakDownBlock.style.display = "block";
-        }
-
-        dayChartBreakDownBlock.heading = label;
-        dayDistributionChart.data.datasets[0].data = chartData;
-        dayDistributionChart.data.labels = chartLabels;
-
-        const backgroundColors = Array(chartData.length).fill("#007AC2");
-        dayDistributionChart.data.datasets[0].backgroundColor = backgroundColors;
-        dayDistributionChart.update();
-      }
-
-      // called from applyFilterToAccidentsSDStatus function to update the clicked bar color
-      function changeBarColor(chart, index, color) {
-        chart.data.datasets[0].backgroundColor[index] = color;
-        chart.update();
-      }
-
-      // UI controls visible in the upper right panel
-      let activeGraph = "day";
-
-
-      // this function is called when the app loads. It creates three charts showing
-      // total accidents by time of day, by day of the week and months
-      function updateChart(canvas, data, labels, remove, max) {
-        const canvasElement = document.getElementById(canvas);
-
-        const backgroundColors = Array(data.length).fill("#007AC2");
-        // Get the canvas element and render the chart in it
-        let chart = new Chart(canvasElement.getContext("2d"), {
-          type: "bar",
-          data: {
-            labels: labels,
-            datasets: [
-              {
-                backgroundColor: backgroundColors,
-                data: data
-              }
-            ]
-          },
-          options: {
-            responsive: false,
-            legend: {
-              display: false
-            },
-            scales: {
-              yAxes: [
-                {
-                  ticks: {
-                    beginAtZero: true,
-                    max: max
-                  }
-                }
-              ]
-            },
-            tooltips: {
-              displayColors: false,
-              callbacks: {
-                label: (tooltipItem, data) => {
-                  const total =
-                    data.datasets[tooltipItem.datasetIndex].data[
-                      tooltipItem.index
-                    ];
-                  return (
-                    data.labels[tooltipItem.index] +
-                    " - Total accidents: " +
-                    total
-                  );
-                }
-              }
-            }
-          }
-        });
-        if (!remove) {
-          charts.push(chart);
-          // add mouse-move event listener on the charts so that we can display features
-          // corresponding to the selected by on the chart
-          canvasElement.addEventListener("click", async () => {
-            const data = await applyFilterToAccidentsSDStatus(event, chart);
-          });
-        }
-
-        return chart;
-      }
-
-      // add a legend widget to the view
-      const legendExpand = new Expand({
-        expandIcon: "legend",
-        view: view,
-        content: new Legend({
-          view,
-          layerInfos: [
-            {
-              layer: layer,
-              title: "Fatal accidents by time of day (2021)"
-            }
-          ]
-        })
+      // Create the layer and set the renderer
+      const trails = new FeatureLayer({
+        url: "https://services3.arcgis.com/GVgbJbqm8hXASVYi/arcgis/rest/services/Trails/FeatureServer/0",
+        renderer: trailsRenderer,
+        opacity: 0.75
       });
-      view.ui.add(legendExpand, "bottom-left");
 
-      function createSymbol(color) {
+      // Add the layer
+      map.add(trails,0);
+
+      // Add bikes only trails
+      const bikeTrailsRenderer = {
+        type: "simple",
+        symbol: {
+          type: "simple-line",
+          style: "short-dot",
+          color: "#FF91FF",
+          width: "1px"
+        }
+      };
+
+      const bikeTrails = new FeatureLayer({
+        url:
+          "https://services3.arcgis.com/GVgbJbqm8hXASVYi/arcgis/rest/services/Trails/FeatureServer/0",
+        renderer: bikeTrailsRenderer,
+        definitionExpression: "USE_BIKE = 'YES'"
+      });
+
+      map.add(bikeTrails, 1);
+
+      // Add parks with a class breaks renderer and unique symbols
+      function createFillSymbol(value, color) {
         return {
-          type: "simple-marker",
-          color: color,
-          size: "5px",
-          outline: null,
-          outline: {
-            color: "rgba(153, 31, 23, 0.3)",
-            width: 0.3
-          }
+          "value": value,
+          "symbol": {
+            "color": color,
+            "type": "simple-fill",
+            "style": "solid",
+            "outline": {
+              "style": "none"
+            }
+          },
+          "label": value
         };
       }
-    })());
+
+      const openSpacesRenderer = {
+        type: "unique-value",
+        field: "TYPE",
+        uniqueValueInfos: [
+          createFillSymbol("Natural Areas", "#9E559C"),
+          createFillSymbol("Regional Open Space", "#A7C636"),
+          createFillSymbol("Local Park", "#149ECE"),
+          createFillSymbol("Regional Recreation Park", "#ED5151")
+        ]
+      };
+
+      // Create the layer and set the renderer
+      const openspaces = new FeatureLayer({
+        url: "https://services3.arcgis.com/GVgbJbqm8hXASVYi/arcgis/rest/services/Parks_and_Open_Space/FeatureServer/0",
+        renderer: openSpacesRenderer,
+        opacity: 0.2
+      });
+
+      // Add the layer
+      map.add(openspaces,0);
+
+    });
   </script>
-  </head>
-  <body>
-    <div id="viewDiv"></div>
-    <calcite-shell content-behind class="custom-example-theme">
-      <calcite-shell-panel id="rightPanel" slot="panel-end" display-mode="float">
-        <calcite-panel id="statsPanel" heading="Fatal Accidents in USA - 2021" description="Explore accidents data">
-          <calcite-block open id="chart-block" heading="Total accidents by time of day">
-            <canvas class="canvas" id="chart-SDStatus" height="200" width="400"></canvas>
-          </calcite-block>
-          <calcite-notice slot="footer" open width="full" icon>
-            <span slot="title">Note</span>
-            <span slot="message">Click on the graph bars to highlight the data in the map</span>
-          </calcite-notice>
-        </calcite-panel>
-      </calcite-shell-panel>
-  </calcite-shell>
-  </body>
+
+</head>
+<body>
+  <div id="viewDiv"></div>
+</body>
 </html>
