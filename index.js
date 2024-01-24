@@ -1733,7 +1733,7 @@ require([
        {
          type: "field",
          fieldName: "total_no_customer",
-         label: "total_no_customer"
+         label: "Total No Customer"
        }
        ,
        {
@@ -1745,43 +1745,19 @@ require([
        {
          type: "field",
          fieldName: "maintenance",
-         label: "maintenance"
+         label: "Maintenance"
        }
        ,
        {
          type: "field",
          fieldName: "outages",
-         label: "outages"
+         label: "Outages"
        }
        ,
        {
          type: "field",
          fieldName: "gov",
-         label: "gov"
-       }
-       ,
-       {
-         type: "field",
-         fieldName: "MaintenanceSiteOperation",
-         label: "MaintenanceSiteOperation"
-       }
-       ,
-       {
-         type: "field",
-         fieldName: "OutagesData",
-         label: "OutagesData"
-       }
-       ,
-       {
-         type: "field",
-         fieldName: "Sites_Buffer3",
-         label: "Sites_Buffer3"
-       }
-       ,
-       {
-         type: "field",
-         fieldName: "CCTicketsFC",
-         label: "CCTicketsFC"
+         label: "GOV"
        }
      ]
    },
@@ -1885,40 +1861,40 @@ require([
          // Autocast to FieldColumnTemplate.
          type: "field",
          fieldName: "operation_id",
-         label: "operation_id",
+         label: "Operation ID",
          // direction: "des"
        },
        {
          type: "field",
          fieldName: "operation_name",
-         label: "operation_name"
+         label: "Operation Name"
        },
        {
          type: "field",
          fieldName: "operation_category",
-         label: "operation_category"
+         label: "Operation Category"
        },
        {
          type: "field",
          fieldName: "peration_date",
-         label: "peration_date"
+         label: "Peration Date"
        },
        {
          type: "field",
          fieldName: "site_id",
-         label: "site_id"
+         label: "Site ID"
        }
        ,
        {
          type: "field",
          fieldName: "status",
-         label: "status"
+         label: "Status"
        }
        ,
        {
          type: "field",
          fieldName: "cell_id",
-         label: "cell_id"
+         label: "Cell ID"
        }
      ]
    },
@@ -1946,160 +1922,160 @@ require([
          // Autocast to FieldColumnTemplate.
          type: "field",
          fieldName: "incident_id",
-         label: "incident_id",
+         label: "Incident ID",
          // direction: "des"
        },
        {
          type: "field",
          fieldName: "status",
-         label: "status"
+         label: "Status"
        },
        {
          type: "field",
          fieldName: "kpi_category",
-         label: "kpi_category"
+         label: "KPI category"
        },
        {
          type: "field",
          fieldName: "kpi_subcategory",
-         label: "kpi_subcategory"
+         label: "KPI Subcategory"
        },
        {
          type: "field",
          fieldName: "assignment",
-         label: "assignment"
+         label: "Assignment"
        }
        ,
        {
          type: "field",
          fieldName: "cluster",
-         label: "cluster"
+         label: "Cluster"
        }
        ,
        {
          type: "field",
          fieldName: "element",
-         label: "element"
+         label: "Element"
        }
        ,
        {
          type: "field",
          fieldName: "province_city",
-         label: "province_city"
+         label: "Province City"
        }
        ,
        {
          type: "field",
          fieldName: "ne_name",
-         label: "ne_name"
+         label: "NE name"
        }
        ,
        {
          type: "field",
          fieldName: "affectedobject",
-         label: "affectedobject"
+         label: "Affectedobject"
        }
        ,
        {
          type: "field",
          fieldName: "site_id",
-         label: "site_id"
+         label: "Site ID"
        }
        ,
        {
          type: "field",
          fieldName: "site_name",
-         label: "site_name"
+         label: "Site Name"
        }
        ,
        {
          type: "field",
          fieldName: "original_event_time",
-         label: "original_event_time"
+         label: "Original Event Time"
        }
        ,
        {
          type: "field",
          fieldName: "clearance_time",
-         label: "clearance_time"
+         label: "Clearance Time"
        }
        ,
        {
          type: "field",
          fieldName: "close_time",
-         label: "close_time"
+         label: "Close Time"
        }
        ,
        {
          type: "field",
          fieldName: "duration",
-         label: "duration"
+         label: "Duration"
        }
        ,
        {
          type: "field",
          fieldName: "open_time",
-         label: "open_time"
+         label: "Open Time"
        }
        ,
        {
          type: "field",
          fieldName: "alarm_number",
-         label: "alarm_number"
+         label: "Alarm Number"
        }
        ,
        {
          type: "field",
          fieldName: "alarm_severity",
-         label: "alarm_severity"
+         label: "Alarm Severity"
        }
        ,
        {
          type: "field",
          fieldName: "affected_sector",
-         label: "affected_sector"
+         label: "Affected Sector"
        }
        ,
        {
          type: "field",
          fieldName: "problem_category",
-         label: "problem_category"
+         label: "Problem Category"
        }
        ,
        {
          type: "field",
          fieldName: "reason",
-         label: "reason"
+         label: "Reason"
        }
        ,
        {
          type: "field",
          fieldName: "service_affected",
-         label: "service_affected"
+         label: "Service Affected"
        }
        ,
        {
          type: "field",
          fieldName: "resolution_code",
-         label: "resolution_code"
+         label: "Resolution Code"
        }
        ,
        {
          type: "field",
          fieldName: "notification_id",
-         label: "notification_id"
+         label: "Notification ID"
        }
        ,
        {
          type: "field",
          fieldName: "resolution",
-         label: "resolution"
+         label: "Resolution"
        }
        ,
        {
          type: "field",
          fieldName: "update_time",
-         label: "update_time"
+         label: "Update Time"
        }
      ]
    },
@@ -2127,28 +2103,28 @@ require([
          // Autocast to FieldColumnTemplate.
          type: "field",
          fieldName: "piroirty",
-         label: "piroirty",
+         label: "Piroirty",
          // direction: "des"
        },
        {
          type: "field",
          fieldName: "work_order_id",
-         label: "work order id"
+         label: "Work Order ID"
        },
        {
          type: "field",
          fieldName: "outages_id",
-         label: "outages id"
+         label: "Outages ID"
        },
        {
          type: "field",
          fieldName: "maintenance_id",
-         label: "maintenance id"
+         label: "Maintenance ID"
        },
        {
          type: "field",
          fieldName: "description",
-         label: "description"
+         label: "Description"
        }
        ,
        {
@@ -2160,25 +2136,25 @@ require([
        {
          type: "field",
          fieldName: "due_date",
-         label: "due date"
+         label: "Due Date"
        }
        ,
        {
          type: "field",
          fieldName: "in_progress_date",
-         label: "in progress date"
+         label: "In Progress Date"
        }
        ,
        {
          type: "field",
          fieldName: "completed_date",
-         label: "completed date"
+         label: "Completed Date"
        }
        ,
        {
          type: "field",
          fieldName: "cell_id",
-         label: "cell id"
+         label: "Cell ID"
        }
      ]
    },
