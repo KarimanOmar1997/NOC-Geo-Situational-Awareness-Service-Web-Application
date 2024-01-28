@@ -332,10 +332,10 @@ require([
       fieldName: "sd_id",
       label: "SD ID:"
     },
-    {
-      fieldName: "sd_open_time",
-      label: "SD Open Time:"
-    },
+    // {
+    //   fieldName: "sd_open_time",
+    //   label: "SD Open Time:"
+    // },
     {
       fieldName: "sd_opened_by",
       label: "SD Opened By:"
@@ -1789,11 +1789,11 @@ require([
           label: "TicketID",
           // direction: "des"
         },
-        {
-          type: "field",
-          fieldName: "sd_open_time",
-          label: "SD OPEN TIME"
-        },
+        // {
+        //   type: "field",
+        //   fieldName: "sd_open_time",
+        //   label: "SD OPEN TIME"
+        // },
         {
           type: "field",
           fieldName: "sd_status",
