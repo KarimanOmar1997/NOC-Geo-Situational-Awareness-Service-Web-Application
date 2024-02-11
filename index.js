@@ -587,6 +587,7 @@ require([
      handles.removeAll();
      featureTableHPSMTickets.highlightIds.removeAll();
      featureTableTwors.highlightIds.removeAll();
+     featureTableCells.highlightIds.removeAll();
      document.getElementById("Data_Container_By_Select").innerHTML =" "
      layerBlockArray.forEach((block) => {
        while (block.lastElementChild) {
@@ -1674,6 +1675,7 @@ require([
  
  const featureLayerTwors = map.layers.getItemAt(5); // Grabs the first layer in the map
  const featureLayerHPSMTickets = map.layers.getItemAt(6); // Grabs the first layer in the map
+ const featureLayerCells = map.layers.getItemAt(4); // Grabs the first layer in the map
  const featureLayerMaintenanceSiteOperation = new FeatureLayer({
  url: "https://services3.arcgis.com/N0l9vjYH8GLn5HZh/arcgis/rest/services/Asia_Cell_V4/FeatureServer/4"
  });
@@ -1688,6 +1690,8 @@ require([
  featureLayerMaintenanceSiteOperation.title = "Maintenance Site Operation";
  featureLayerOutagesData.title = "Outages Data";
  featureLayerWorkOrderData.title = "Work Order Data";
+ featureLayerWorkOrderData.title = "Work Order Data";
+ featureLayerCells.title = "Cell Sites";
  
  // Create the feature table
  const featureTableTwors = new FeatureTable({
@@ -2160,6 +2164,103 @@ require([
    },
    container: document.getElementById("tableDiv-work-order")
  });
+ const featureTableCells = new FeatureTable({
+   view: view, // Required for feature highlight to work
+   layer: featureLayerCells,
+   visibleElements: {
+     // Autocast to VisibleElements
+     menuItems: {
+       clearSelection: true,
+       refreshData: true,
+       toggleColumns: true,
+       selectedRecordsShowAllToggle: true,
+       selectedRecordsShowSelectedToggle: true,
+       zoomToSelection: true
+     }
+   },
+   tableTemplate: {
+     // Autocast to TableTemplate
+     columnTemplates: [
+       // Takes an array of FieldColumnTemplate and GroupColumnTemplate
+       {
+         // Autocast to FieldColumnTemplate.
+         type: "field",
+         fieldName: "site_id",
+         label: "Site ID",
+         // direction: "des"
+       },
+       {
+         type: "field",
+         fieldName: "site_name",
+         label: "Site Name"
+       },
+       {
+         type: "field",
+         fieldName: "total_no_customer",
+         label: "Total No Customer"
+       },
+       {
+         type: "field",
+         fieldName: "site_type",
+         label: "Site Type"
+       },
+       {
+         type: "field",
+         fieldName: "covergae_area_id",
+         label: "Covergae Area ID"
+       }
+       ,
+       {
+         type: "field",
+         fieldName: "coverage_status",
+         label: "Coverage Status"
+       }
+       ,
+       {
+         type: "field",
+         fieldName: "coverage_status_date_time",
+         label: "Coverage Status Date Time"
+       }
+       ,
+       {
+         type: "field",
+         fieldName: "coverage_location",
+         label: "Coverage Location"
+       }
+       ,
+       {
+         type: "field",
+         fieldName: "cgi",
+         label: "CGI"
+       }
+       ,
+       {
+         type: "field",
+         fieldName: "outage",
+         label: "Outage"
+       }
+       ,
+       {
+         type: "field",
+         fieldName: "maintentance",
+         label: "Maintentance"
+       }
+       ,
+       {
+         type: "field",
+         fieldName: "network_type",
+         label: "Network Type"
+       }
+       ,
+       {
+         type: "field",
+         fieldName: "gov",
+         label: "GOV"
+       }
+     ]
+   },
+   container: document.getElementById("tableDiv-Cells")
+ });
  
  // Listen for when the view is stationary.
  // If true, set the table to display only the attributes
@@ -2171,6 +2272,7 @@ require([
      // Filter out and show only the visible features in the feature table.
      featureTableTwors.filterGeometry = view.extent;
      featureTableHPSMTickets.filterGeometry = view.extent;
+     featureTableCells.filterGeometry = view.extent;
     //  featureTableMaintenanceSiteOperation.filterGeometry = view.extent;
     //  featureTableOutagesData.filterGeometry = view.extent;
     //  featureTableWorkOrderData.filterGeometry = view.extent;
@@ -2187,6 +2289,7 @@ require([
    handles.removeAll();
    featureTableHPSMTickets.highlightIds.removeAll();
    featureTableTwors.highlightIds.removeAll();
+   featureTableCells.highlightIds.removeAll();
 
    candidate = response.results.find((result) => {
     if(result.graphic.layer === featureLayerTwors){
@@ -2248,7 +2351,7 @@ require([
         // Add this feature to the featureTableTwors highlightIds collection
       }
     }
-    else if(candidate.layer.title == "CCTicketsFC"){
+    else if(candidate.layer.title == "HPSM Tickets"){
 
       
           if (featureTableHPSMTickets.highlightIds.includes(objectId)) {
@@ -2258,6 +2361,18 @@ require([
           } else {
             // Add this feature to the featureTableHPSMTickets highlightIds collection
             featureTableHPSMTickets.highlightIds.add(objectId);
+          }
+    }
+    else if(candidate.layer.title == "Cell Sites"){
+
+      
+          if (featureTableCells.highlightIds.includes(objectId)) {
+            // Remove feature from current selection if feature
+            // is already added to highlightIds collection
+            featureTableCells.highlightIds.remove(objectId);
+          } else {
+            // Add this feature to the featureTableHPSMTickets highlightIds collection
+            featureTableCells.highlightIds.add(objectId);
           }
     }
     else if(candidate.layer.title == "Governerate"){
@@ -2287,15 +2402,7 @@ require([
         });
       }
     }
-    else if(candidate.layer.title == "Cell Sites"){
-      if (candidate.graphic.layer.type === "feature") {
-        layerViews.forEach((layerView) => {
-          if (candidate.graphic.layer.title === layerView.layer.title) {
-            handles.add(layerView.highlight(candidate.graphic));
-          }
-        });
-      }
-    }
+
  
    }
  });
@@ -2345,48 +2452,26 @@ require([
      });
    }
  );
-//  reactiveUtils.watch(
-//    () => featureTableMaintenanceSiteOperation.highlightIds.length,
-//    (highlightIdsCount) => {
-//      // Iterate through the filters within the table.
-//      // If the active filter is "Show selection",
-//      // changes made to highlightIds (adding/removing)
-//      // are reflected.
+ reactiveUtils.watch(
+   () => featureTableCells.highlightIds.length,
+   (highlightIdsCount) => {
+     // Iterate through the filters within the table.
+     // If the active filter is "Show selection",
+     // changes made to highlightIds (adding/removing)
+     // are reflected.
  
-//      featureTableMaintenanceSiteOperation.viewModel.activeFilters.forEach((filter) => {
-//        if (filter.type === "selection") {
-//          selectionIdCount = filter.objectIds.length; // the filtered selection's id count
-//          // Check that the filter selection count is equal to the
-//          // highlightIds collection count. If not, update filter selection.
-//          if (selectionIdCount !== highlightIdsCount) {
-//            featureTableMaintenanceSiteOperation.filterBySelection();
-//          }
-//        }
-//      });
-//    }
-//  );
-//  reactiveUtils.watch(
-//    () => featureTableOutagesData.highlightIds.length,
-//    (highlightIdsCount) => {
-//      // Iterate through the filters within the table.
-//      // If the active filter is "Show selection",
-//      // changes made to highlightIds (adding/removing)
-//      // are reflected.
- 
-//      featureTableOutagesData.viewModel.activeFilters.forEach((filter) => {
-//        if (filter.type === "selection") {
-//          selectionIdCount = filter.objectIds.length; // the filtered selection's id count
-//          // Check that the filter selection count is equal to the
-//          // highlightIds collection count. If not, update filter selection.
-//          if (selectionIdCount !== highlightIdsCount) {
-//            featureTableOutagesData.filterBySelection();
-//          }
-//        }
-//      });
-//    }
-//  );
- 
+     featureTableCells.viewModel.activeFilters.forEach((filter) => {
+       if (filter.type === "selection") {
+         selectionIdCount = filter.objectIds.length; // the filtered selection's id count
+         // Check that the filter selection count is equal to the
+         // highlightIds collection count. If not, update filter selection.
+         if (selectionIdCount !== highlightIdsCount) {
+          featureTableCells.filterBySelection();
+         }
+       }
+     });
+   }
+ );
 
- 
  })();
  });
