@@ -101,7 +101,7 @@ require([
  console.log("to get 4 :",map.layers.getItemAt(4).title);
  console.log("to get 5 :",map.layers.getItemAt(5).title);
  console.log("to get 6 :",map.layers.getItemAt(6).title);
-//  console.log("to get 7 :",map.layers.getItemAt(7).title);
+ console.log("to get 7 :",map.layers.getItemAt(7).title);
 //  console.log("to get 8 :",map.layers.getItemAt(8).title);
 //  console.log("to get 9 :",map.layers.getItemAt(9).title);
 //  console.log("to get 10 :",map.layers.getItemAt(10).title);
@@ -118,25 +118,6 @@ require([
   };
 }
 
- const colors = [ "red", "green" ];
- const predominanceArcade = document.getElementById("predominance").text;
- const renderer = {
-   type: "unique-value",
-  //  field: "outage",
-  valueExpression: predominanceArcade ,
-   uniqueValueInfos: [
-     {
-       value: "yes",
-       symbol: createSymbol2(colors[0])
-     }, {
-       value: "no",
-       symbol: createSymbol2(colors[1])
-     }
-   ]
- };
-//  map.layers.getItemAt(6).renderer= renderer;
-
-//  map.layers.getItemAt(6).blendMode = "multiply";
 
  map.layers.getItemAt(5).popupTemplate= {
    title: "{site_id}",
@@ -588,6 +569,7 @@ require([
      featureTableHPSMTickets.highlightIds.removeAll();
      featureTableTwors.highlightIds.removeAll();
      featureTableCells.highlightIds.removeAll();
+     featureTableJammerSites.highlightIds.removeAll();
      document.getElementById("Data_Container_By_Select").innerHTML =" "
      layerBlockArray.forEach((block) => {
        while (block.lastElementChild) {
@@ -1676,6 +1658,7 @@ require([
  const featureLayerTwors = map.layers.getItemAt(5); // Grabs the first layer in the map
  const featureLayerHPSMTickets = map.layers.getItemAt(6); // Grabs the first layer in the map
  const featureLayerCells = map.layers.getItemAt(4); // Grabs the first layer in the map
+ const featureLayerJammerSites = map.layers.getItemAt(7);
  const featureLayerMaintenanceSiteOperation = new FeatureLayer({
  url: "https://services3.arcgis.com/N0l9vjYH8GLn5HZh/arcgis/rest/services/Asia_Cell_V4/FeatureServer/4"
  });
@@ -1685,6 +1668,9 @@ require([
  const featureLayerWorkOrderData = new FeatureLayer({
  url: "https://services3.arcgis.com/N0l9vjYH8GLn5HZh/arcgis/rest/services/work_order/FeatureServer/2"
  });
+ const featureLayerInterference = new FeatureLayer({
+  url: "https://services3.arcgis.com/N0l9vjYH8GLn5HZh/arcgis/rest/services/Cell_Site_Data/FeatureServer/6"
+});
  featureLayerTwors.title = "Sites";
  featureLayerHPSMTickets.title = "HPSM Tickets";
  featureLayerMaintenanceSiteOperation.title = "Maintenance Site Operation";
@@ -2261,6 +2247,127 @@ require([
    },
    container: document.getElementById("tableDiv-Cells")
  });
+ const featureTableJammerSites = new FeatureTable({
+  view: view, // Required for feature highlight to work
+  layer: featureLayerJammerSites,
+  visibleElements: {
+    // Autocast to VisibleElements
+    menuItems: {
+      clearSelection: true,
+      refreshData: true,
+      toggleColumns: true,
+      selectedRecordsShowAllToggle: true,
+      selectedRecordsShowSelectedToggle: true,
+      zoomToSelection: true
+    }
+  },
+  tableTemplate: {
+    // Autocast to TableTemplate
+    columnTemplates: [
+      // Takes an array of FieldColumnTemplate and GroupColumnTemplate
+      {
+        // Autocast to FieldColumnTemplate.
+        type: "field",
+        fieldName: "Site_ID",
+        label: "Site ID",
+       
+      }
+      ,
+      {
+        type: "field",
+        fieldName: "Full_Site_Name",
+        label: "Full Site Name"
+      }
+      ,
+      {
+        type: "field",
+        fieldName: "Longitude",
+        label: "Longitude"
+      }
+      ,
+      {
+        type: "field",
+        fieldName: "Latitude",
+        label: "Latitude"
+      }
+
+    ]
+  },
+  container: document.getElementById("tableDiv-JammerSites")
+});
+const featureTableInterference = new FeatureTable({
+  view: view, // Required for feature highlight to work
+  layer: featureLayerInterference,
+  visibleElements: {
+    // Autocast to VisibleElements
+    menuItems: {
+      clearSelection: true,
+      refreshData: true,
+      toggleColumns: true,
+      selectedRecordsShowAllToggle: true,
+      selectedRecordsShowSelectedToggle: true,
+      zoomToSelection: true
+    }
+  },
+  tableTemplate: {
+    // Autocast to TableTemplate
+    columnTemplates: [
+      // Takes an array of FieldColumnTemplate and GroupColumnTemplate
+      {
+        // Autocast to FieldColumnTemplate.
+        type: "field",
+        fieldName: "Date",
+        label: "Date",
+       
+      }
+      ,
+      {
+        type: "field",
+        fieldName: "Cell_FDD_TDD_Indication",
+        label: "Cell FDD TDD Indication"
+      }
+      ,
+      {
+        type: "field",
+        fieldName: "eNodeB_Name",
+        label: "eNodeB Name"
+      }
+      ,
+      {
+        type: "field",
+        fieldName: "Cell_Name",
+        label: "Cell Name"
+      }
+      ,
+      {
+        type: "field",
+        fieldName: "eNodeB_Function_Name",
+        label: "eNodeB Function Name"
+      }
+      ,
+      {
+        type: "field",
+        fieldName: "LocalCell_Id",
+        label: "LocalCell ID"
+      }
+      ,
+      {
+        type: "field",
+        fieldName: "Integrity",
+        label: "Integrity"
+      }
+      ,
+      {
+        type: "field",
+        fieldName: "LULInterferenceAvg_dBm_",
+        label: "LULInterferenceAvg dBm"
+      }
+
+    ]
+  },
+  container: document.getElementById("tableDiv-Interference")
+});
+
  
  // Listen for when the view is stationary.
  // If true, set the table to display only the attributes
@@ -2273,6 +2380,7 @@ require([
      featureTableTwors.filterGeometry = view.extent;
      featureTableHPSMTickets.filterGeometry = view.extent;
      featureTableCells.filterGeometry = view.extent;
+     featureTableJammerSites.filterGeometry = view.extent;
     //  featureTableMaintenanceSiteOperation.filterGeometry = view.extent;
     //  featureTableOutagesData.filterGeometry = view.extent;
     //  featureTableWorkOrderData.filterGeometry = view.extent;
@@ -2290,6 +2398,7 @@ require([
    featureTableHPSMTickets.highlightIds.removeAll();
    featureTableTwors.highlightIds.removeAll();
    featureTableCells.highlightIds.removeAll();
+   featureTableJammerSites.highlightIds.removeAll();
 
    candidate = response.results.find((result) => {
     if(result.graphic.layer === featureLayerTwors){
@@ -2303,6 +2412,12 @@ require([
         result.graphic.layer === featureLayerHPSMTickets 
   
      }
+     else if (result.graphic.layer === featureLayerJammerSites) {
+      return result.graphic &&
+        result.graphic.layer &&
+        result.graphic.layer === featureLayerJammerSites
+
+    }
      else if (result.graphic.layer === map.layers.getItemAt(4)){
       return result.graphic &&
       result.graphic.layer &&
@@ -2373,6 +2488,18 @@ require([
           } else {
             // Add this feature to the featureTableHPSMTickets highlightIds collection
             featureTableCells.highlightIds.add(objectId);
+          }
+    }
+    else if(candidate.layer.title == "Cell_Site_Data - Jammer_Sites"){
+
+      
+          if (featureTableJammerSites.highlightIds.includes(objectId)) {
+            // Remove feature from current selection if feature
+            // is already added to highlightIds collection
+            featureTableJammerSites.highlightIds.remove(objectId);
+          } else {
+            // Add this feature to the featureTableHPSMTickets highlightIds collection
+            featureTableJammerSites.highlightIds.add(objectId);
           }
     }
     else if(candidate.layer.title == "Governerate"){
@@ -2467,6 +2594,26 @@ require([
          // highlightIds collection count. If not, update filter selection.
          if (selectionIdCount !== highlightIdsCount) {
           featureTableCells.filterBySelection();
+         }
+       }
+     });
+   }
+ );
+ reactiveUtils.watch(
+   () => featureTableJammerSites.highlightIds.length,
+   (highlightIdsCount) => {
+     // Iterate through the filters within the table.
+     // If the active filter is "Show selection",
+     // changes made to highlightIds (adding/removing)
+     // are reflected.
+ 
+     featureTableJammerSites.viewModel.activeFilters.forEach((filter) => {
+       if (filter.type === "selection") {
+         selectionIdCount = filter.objectIds.length; // the filtered selection's id count
+         // Check that the filter selection count is equal to the
+         // highlightIds collection count. If not, update filter selection.
+         if (selectionIdCount !== highlightIdsCount) {
+          featureTableJammerSites.filterBySelection();
          }
        }
      });

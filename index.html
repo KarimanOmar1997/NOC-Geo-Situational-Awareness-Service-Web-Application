@@ -299,9 +299,11 @@
               <button class="nav-link active" id="nav-Towers-tab" data-bs-toggle="tab" data-bs-target="#nav-Towers" type="button" role="tab" aria-controls="nav-Towers" aria-selected="true">Sites</button>
               <button class="nav-link" id="nav-HPMS-Tickets-tab" data-bs-toggle="tab" data-bs-target="#nav-HPMS-Tickets" type="button" role="tab" aria-controls="nav-HPMS-Tickets" aria-selected="false">HPSM Tickets</button>
               <button class="nav-link" id="nav-Maintenance-Site-Operation-tab" data-bs-toggle="tab" data-bs-target="#nav-Maintenance-Site-Operation" type="button" role="tab" aria-controls="nav-Maintenance-Site-Operation" aria-selected="false">Maintenance Site Operation</button>
+              <button class="nav-link" id="nav-Cells-tab" data-bs-toggle="tab" data-bs-target="#nav-Cells" type="button" role="tab" aria-controls="nav-Cells" aria-selected="false" >Cell Sites</button>
+              <button class="nav-link" id="nav-JammerSites-tab" data-bs-toggle="tab" data-bs-target="#nav-JammerSites" type="button" role="tab" aria-controls="nav-JammerSites" aria-selected="false" >Jammer Sites</button>
               <button class="nav-link" id="nav-OutagesData-tab" data-bs-toggle="tab" data-bs-target="#nav-OutagesData" type="button" role="tab" aria-controls="nav-OutagesData" aria-selected="false" >OutagesData</button>
               <button class="nav-link" id="nav-work-order-tab" data-bs-toggle="tab" data-bs-target="#nav-work-order" type="button" role="tab" aria-controls="nav-work-order" aria-selected="false" >Work Order</button>
-              <button class="nav-link" id="nav-Cells-tab" data-bs-toggle="tab" data-bs-target="#nav-Cells" type="button" role="tab" aria-controls="nav-Cells" aria-selected="false" >Cell Sites</button>
+              <button class="nav-link" id="nav-Interference-tab" data-bs-toggle="tab" data-bs-target="#nav-Interference" type="button" role="tab" aria-controls="nav-Interference" aria-selected="false" >Interference</button>
             </div>
           </nav>
           <div class="tab-content d-flex" id="nav-tabContent">
@@ -317,6 +319,14 @@
               <div id="tableDiv-MaintenanceSiteOperation">
               </div>
             </div>
+            <div class="container tab-pane fade mb-3" id="nav-Cells" role="tabpanel" aria-labelledby="nav-Cells-tab" tabindex="0">
+              <div id="tableDiv-Cells">
+              </div>
+            </div>
+            <div class="container tab-pane fade mb-3" id="nav-JammerSites" role="tabpanel" aria-labelledby="nav-JammerSites-tab" tabindex="0">
+              <div id="tableDiv-JammerSites">
+              </div>
+            </div>
             <div class="container tab-pane fade mb-3" id="nav-OutagesData" role="tabpanel" aria-labelledby="nav-OutagesData-tab" tabindex="0">
               <div id="tableDiv-OutagesData">
               </div>
@@ -325,28 +335,12 @@
               <div id="tableDiv-work-order">
               </div>
             </div>
-            <div class="container tab-pane fade mb-3" id="nav-Cells" role="tabpanel" aria-labelledby="nav-Cells-tab" tabindex="0">
-              <div id="tableDiv-Cells">
+            <div class="container tab-pane fade mb-3" id="nav-Interference" role="tabpanel" aria-labelledby="nav-Interference-tab" tabindex="0">
+              <div id="tableDiv-Interference">
               </div>
             </div>
           </div>
 
-          <script type="text/plain" id="predominance">
-            try {
-              var fsinspected = FeatureSetByRelationshipName($feature, 'CCTicketsFC', null, true);
-              console.log('FeatureSet count:', Count(fsinspected));
-              if (Count(fsinspected) > 0) {
-                console.log('Expression result: yes');
-                return "yes";
-              } else {
-                console.log('Expression result: no');
-                return "no";
-              }
-              console.log('Expression');
-            } catch (error) {
-              console.error('Error:', error);
-            }
-          </script>
         <script src="./bootstrap-5.2.3-dist/js/bootstrap.bundle.min.js" integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4" crossorigin="anonymous"></script>
         <script src="https://unpkg.com/@esri/arcgis-rest-request@4.0.0/dist/bundled/request.umd.js"></script>
         <script src="https://unpkg.com/@esri/arcgis-rest-feature-service@4.0.0/dist/bundled/feature-service.umd.js"></script>
