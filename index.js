@@ -102,7 +102,7 @@ require([
  console.log("to get 5 :",map.layers.getItemAt(5).title);
  console.log("to get 6 :",map.layers.getItemAt(6).title);
  console.log("to get 7 :",map.layers.getItemAt(7).title);
-//  console.log("to get 8 :",map.layers.getItemAt(8).title);
+ console.log("to get 8 :",map.layers.getItemAt(8).title);
 //  console.log("to get 9 :",map.layers.getItemAt(9).title);
 //  console.log("to get 10 :",map.layers.getItemAt(10).title);
 //  console.log(map.layers.getItemAt(6));
@@ -875,14 +875,17 @@ require([
      console.error("Error during query: ", error);
  });
  }
- var MaintenanceSiteOperationFeatureLayer = new FeatureLayer({
+ const MaintenanceSiteOperationFeatureLayer = new FeatureLayer({
  url: "https://services3.arcgis.com/N0l9vjYH8GLn5HZh/arcgis/rest/services/Asia_Cell_V4/FeatureServer/4"
  });
- var OutagesDataFeatureLayer = new FeatureLayer({
+ const OutagesDataFeatureLayer = new FeatureLayer({
  url: "https://services3.arcgis.com/N0l9vjYH8GLn5HZh/arcgis/rest/services/Asia_Cell_V4/FeatureServer/5"
  });
- var WorkOrderDataFeatureLayer = new FeatureLayer({
+ const WorkOrderDataFeatureLayer = new FeatureLayer({
  url: "https://services3.arcgis.com/N0l9vjYH8GLn5HZh/arcgis/rest/services/work_order/FeatureServer/2"
+ });
+ const CellPromotionsFeatureLayer = new FeatureLayer({
+ url: "https://services3.arcgis.com/N0l9vjYH8GLn5HZh/arcgis/rest/services/FiberIssues_WFL1/FeatureServer/4"
  });
  
  // Define the query parameters
@@ -901,12 +904,17 @@ require([
          where: `cell_id = '${site_id}'`, // Specify your query criteria
          outFields: ["*"] // Specify the fields you want to retrieve
        };
+       var queryParamsForCellPromotions = {
+         where: `Cell_ID = '${site_id}'`, // Specify your query criteria
+         outFields: ["*"] // Specify the fields you want to retrieve
+       };
        // Execute the query
  
          
          if (caller == "search") {
            NetworkCoverageFeatureLayer.queryFeatures(queryParams)
            .then(function(result) {
+            if (result.features.length > 0) {
              // Handle the query result
              document.getElementById(caller == "search"?"Data_Container_By_Search":"Data_Container_By_Select").innerHTML +=`
              <div class="accordion-item">
@@ -964,6 +972,12 @@ require([
              `
                // console.log("site",element.attributes);
              }
+            } else {
+              document.getElementById(caller == "search" ? "Data_Container_By_Search" : "Data_Container_By_Select").innerHTML += `
+              <button class="accordion-button collapsed border fw-bold text-danger " type="button" >
+              No Network Coverages Found
+              </button>`
+            }
            })
            .catch(function(error) {
              // Handle errors
@@ -971,75 +985,76 @@ require([
            });
          }
  
-       // Execute the query
+      //  // Execute the query
        
-         MaintenanceSiteOperationFeatureLayer.queryFeatures(queryParams)
-           .then(function(result) {
+      //    MaintenanceSiteOperationFeatureLayer.queryFeatures(queryParams)
+      //      .then(function(result) {
  
-             // Handle the query result
-             document.getElementById(caller == "search"?"Data_Container_By_Search":"Data_Container_By_Select").innerHTML +=`
-             <div class="accordion-item">
-             <h2 class="accordion-header" id="headingTwo">
-               <button class="accordion-button collapsed fw-bold text-success" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
-                 Maintenance Site Operation Data
-               </button>
-             </h2>
-             <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#accordionExample">
-               <div class="accordion-body" id=${caller == "search"?"collapseTwoBodySearch":"collapseTwoBodySelect"}>
-               </div>
-             </div>
-            </div>
-             `
+      //        // Handle the query result
+      //        document.getElementById(caller == "search"?"Data_Container_By_Search":"Data_Container_By_Select").innerHTML +=`
+      //        <div class="accordion-item">
+      //        <h2 class="accordion-header" id="headingTwo">
+      //          <button class="accordion-button collapsed fw-bold text-success" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+      //            Maintenance Site Operation Data
+      //          </button>
+      //        </h2>
+      //        <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#accordionExample">
+      //          <div class="accordion-body" id=${caller == "search"?"collapseTwoBodySearch":"collapseTwoBodySelect"}>
+      //          </div>
+      //        </div>
+      //       </div>
+      //        `
             
-             for (let index = 0; index < result.features.length; index++) {
-               const element = result.features[index];
-               var perationDateObj = new Date(element.attributes.peration_date)
-               document.getElementById(caller == "search"?"collapseTwoBodySearch":"collapseTwoBodySelect").innerHTML +=`
-               <table  class="mt-3 table table-striped table-bordered">
-               <thead>
-                 <th colspan="2">Cell ID: ${element.attributes.cell_id?element.attributes.cell_id:" "}</th>
-               </thead>
-             <tbody>
-               <tr>
-                 <th>Operation Category: </th>
-                 <td> ${element.attributes.operation_category?element.attributes.operation_category:" "}</td>
-               </tr>
-               <tr>
-                 <th>Operation ID: </th>
-                 <td> ${element.attributes.operation_id?element.attributes.operation_id:" "}</td>
-               </tr>
-               <tr>
-                 <th>Operation Name: </th>
-                 <td> ${element.attributes.operation_name?element.attributes.operation_name:" "}</td>
-               </tr>
-               <tr>
-                 <th>Peration Date: </th>
-                 <td> ${perationDateObj?perationDateObj.toUTCString():" "}</td>
-               </tr>
-               <tr>
-                 <th>Site ID: </th>
-                 <td> ${element.attributes.site_id?element.attributes.site_id:" "}</td>
-               </tr>
-               <tr>
-                 <th>Status: </th>
-                 <td> ${element.attributes.status?element.attributes.status:" "}</td>
-               </tr>
-             </tbody>
-           </table>
-             `
-               // console.log("MaintenanceSiteOperation",element.attributes);
-             }
+      //        for (let index = 0; index < result.features.length; index++) {
+      //          const element = result.features[index];
+      //          var perationDateObj = new Date(element.attributes.peration_date)
+      //          document.getElementById(caller == "search"?"collapseTwoBodySearch":"collapseTwoBodySelect").innerHTML +=`
+      //          <table  class="mt-3 table table-striped table-bordered">
+      //          <thead>
+      //            <th colspan="2">Cell ID: ${element.attributes.cell_id?element.attributes.cell_id:" "}</th>
+      //          </thead>
+      //        <tbody>
+      //          <tr>
+      //            <th>Operation Category: </th>
+      //            <td> ${element.attributes.operation_category?element.attributes.operation_category:" "}</td>
+      //          </tr>
+      //          <tr>
+      //            <th>Operation ID: </th>
+      //            <td> ${element.attributes.operation_id?element.attributes.operation_id:" "}</td>
+      //          </tr>
+      //          <tr>
+      //            <th>Operation Name: </th>
+      //            <td> ${element.attributes.operation_name?element.attributes.operation_name:" "}</td>
+      //          </tr>
+      //          <tr>
+      //            <th>Peration Date: </th>
+      //            <td> ${perationDateObj?perationDateObj.toUTCString():" "}</td>
+      //          </tr>
+      //          <tr>
+      //            <th>Site ID: </th>
+      //            <td> ${element.attributes.site_id?element.attributes.site_id:" "}</td>
+      //          </tr>
+      //          <tr>
+      //            <th>Status: </th>
+      //            <td> ${element.attributes.status?element.attributes.status:" "}</td>
+      //          </tr>
+      //        </tbody>
+      //      </table>
+      //        `
+      //          // console.log("MaintenanceSiteOperation",element.attributes);
+      //        }
  
-           })
-           .catch(function(error) {
-             // Handle errors
-             console.error("Error performing query:", error);
-           });
+      //      })
+      //      .catch(function(error) {
+      //        // Handle errors
+      //        console.error("Error performing query:", error);
+      //      });
      
         // Execute the query
          OutagesDataFeatureLayer.queryFeatures(queryParams)
          .then(function(result) {
            // Handle the query result
+           if (result.features.length > 0) {
            document.getElementById(caller == "search"?"Data_Container_By_Search":"Data_Container_By_Select").innerHTML +=`
            <div class="accordion-item">
            <h2 class="accordion-header" id="headingThree">
@@ -1180,6 +1195,12 @@ require([
            `
            // console.log("OutagesData",element.attributes);
            }
+          } else {
+            document.getElementById(caller == "search" ? "Data_Container_By_Search" : "Data_Container_By_Select").innerHTML += `
+            <button class="accordion-button collapsed border fw-bold text-danger " type="button" >
+            No Outages Data Found
+            </button>`
+          }
            })
            .catch(function(error) {
              // Handle errors
@@ -1190,6 +1211,7 @@ require([
         WorkOrderDataFeatureLayer.queryFeatures(queryParamsForWorkOrder)
          .then(function(result) {
            // Handle the query result
+           if (result.features.length > 0) {
            document.getElementById(caller == "search"?"Data_Container_By_Search":"Data_Container_By_Select").innerHTML +=`
            <div class="accordion-item">
            <h2 class="accordion-header" id="headingFour">
@@ -1259,10 +1281,125 @@ require([
            `
            // console.log("OutagesData",element.attributes);
            }
+          } else {
+            document.getElementById(caller == "search" ? "Data_Container_By_Search" : "Data_Container_By_Select").innerHTML += `
+            <button class="accordion-button collapsed border fw-bold text-danger " type="button" >
+            No Work Orders Found
+            </button>`
+          }
            })
            .catch(function(error) {
              // Handle errors
              console.error("Error performing query:", error);
+           });
+ 
+     
+        // Execute the query
+        CellPromotionsFeatureLayer.queryFeatures(queryParamsForCellPromotions)
+         .then(function(result) {
+          if (result.features.length > 0) {
+           // Handle the query result
+           document.getElementById(caller == "search"?"Data_Container_By_Search":"Data_Container_By_Select").innerHTML +=`
+           <div class="accordion-item">
+           <h2 class="accordion-header" id="headingCellPromotions">
+             <button class="accordion-button collapsed fw-bold text-success" type="button" data-bs-toggle="collapse" data-bs-target="#collapseCellPromotions" aria-expanded="false" aria-controls="collapseCellPromotions">
+             Work Order Data
+             </button>
+           </h2>
+           <div id="collapseCellPromotions" class="accordion-collapse collapse" aria-labelledby="headingCellPromotions" data-bs-parent="#accordionExample">
+             <div class="accordion-body" id=${caller == "search"?"collapseCellPromotionsBodySearch":"collapseCellPromotionsBodySelect"}>
+             </div>
+           </div>
+         </div>
+           `
+           for (let index = 0; index < result.features.length; index++) {
+             const element = result.features[index];
+             document.getElementById(caller == "search"?"collapseCellPromotionsBodySearch":"collapseCellPromotionsBodySelect").innerHTML +=`
+             <table  class="mt-3 table table-striped table-bordered">
+             <thead>
+               <th colspan="2">Cell ID: ${element.attributes.Cell_ID?element.attributes.Cell_ID:" "}</th>
+             </thead>
+           <tbody>
+             <tr>
+               <th>Site ID: </th>
+               <td> ${element.attributes.Site_ID?element.attributes.Site_ID:" "}</td>
+             </tr>
+             <tr>
+               <th>RF Region: </th>
+               <td> ${element.attributes.RF_Region?element.attributes.RF_Region:" "}</td>
+             </tr>
+             <tr>
+               <th>Site Name: </th>
+               <td> ${element.attributes.Site_Name?element.attributes.Site_Name:" "}</td>
+             </tr>
+             <tr>
+               <th>Site Type: </th>
+               <td> ${element.attributes.Site_Type?element.attributes.Site_Type:" "}</td>
+             </tr>
+             <tr>
+               <th>RF Province: </th>
+               <td> ${element.attributes.RF_Province?element.attributes.RF_Province:" "}</td>
+             </tr>
+             <tr>
+               <th>GEO Region: </th>
+               <td> ${element.attributes.GEO_Region?element.attributes.GEO_Region:" "}</td>
+             </tr>
+             <tr>
+               <th>GEO City: </th>
+               <td> ${element.attributes.GEO_City?element.attributes.GEO_City:" "}</td>
+             </tr>
+             <tr>
+               <th>District: </th>
+               <td> ${element.attributes.District?element.attributes.District:" "}</td>
+             </tr>
+             <tr>
+               <th>Sub District: </th>
+               <td> ${element.attributes.Sub_District?element.attributes.Sub_District:" "}</td>
+             </tr>
+             <tr>
+               <th>Full Site Name: </th>
+               <td> ${element.attributes.Full_Site_Name?element.attributes.Full_Site_Name:" "}</td>
+             </tr>
+             <tr>
+               <th>BSC Name: </th>
+               <td> ${element.attributes.BSC_Name?element.attributes.BSC_Name:" "}</td>
+             </tr>
+             <tr>
+               <th>MSC Name: </th>
+               <td> ${element.attributes.MSC_Name?element.attributes.MSC_Name:" "}</td>
+             </tr>
+             <tr>
+               <th>Cell Vendor: </th>
+               <td> ${element.attributes.Cell_Vendor?element.attributes.Cell_Vendor:" "}</td>
+             </tr>
+             <tr>
+               <th>UMTS2100 FILTER: </th>
+               <td> ${element.attributes.UMTS2100_FILTER?element.attributes.UMTS2100_FILTER:" "}</td>
+             </tr>
+             <tr>
+               <th>CELL PROMOTIONS: </th>
+               <td> ${element.attributes.CELL_PROMOTIONS?element.attributes.CELL_PROMOTIONS:" "}</td>
+             </tr>
+           </tbody>
+         </table>
+           `
+           // console.log("OutagesData",element.attributes);
+           }
+          } else {
+            document.getElementById(caller == "search" ? "Data_Container_By_Search" : "Data_Container_By_Select").innerHTML += `
+            <button class="accordion-button collapsed border fw-bold text-danger " type="button" >
+            No Promotions Found
+            </button>`
+          }
+           })
+           .catch(function(error) {
+             // Handle errors
+             document.getElementById(caller == "search" ? "Data_Container_By_Search" : "Data_Container_By_Select").innerHTML += `
+             <button class="accordion-button collapsed border fw-bold text-danger " type="button" >
+             No Promotions Found
+             </button>`
+             console.error("Error performing query:", error);
+             
            });
  
      }else{
