@@ -103,8 +103,9 @@ require([
  console.log("to get 6 :",map.layers.getItemAt(6).title);
  console.log("to get 7 :",map.layers.getItemAt(7).title);
  console.log("to get 8 :",map.layers.getItemAt(8).title);
-//  console.log("to get 9 :",map.layers.getItemAt(9).title);
-//  console.log("to get 10 :",map.layers.getItemAt(10).title);
+ console.log("to get 9 :",map.layers.getItemAt(9).title);
+ console.log("to get 10 :",map.layers.getItemAt(10).title);
+
 //  console.log(map.layers.getItemAt(6));
 
  function createSymbol2(color) {
@@ -584,7 +585,7 @@ require([
  includeDefaultSources: false,
  sources: [
    {
-     layer: map.layers.getItemAt(5) ,
+     layer: map.layers.getItemAt(7) ,
      searchFields: ["site_id"],
      displayField: "site_id",
      exactMatch: false,
@@ -752,7 +753,7 @@ require([
  
  typeSelectStatus.addEventListener("change", async() => {
    const value = typeSelectStatus.value;
-     const layer = map.layers.getItemAt(6);
+     const layer = map.layers.getItemAt(10);
      await layer.load();
      // Create an array of layerViews to be able to highlight selected features.
      if (layer.type === "feature") {
@@ -769,7 +770,7 @@ require([
  });
  typeSelectSeverity.addEventListener("change", async() => {
    const value = typeSelectSeverity.value;
-     const layer = map.layers.getItemAt(6);
+     const layer = map.layers.getItemAt(10);
      await layer.load();
      // Create an array of layerViews to be able to highlight selected features.
      if (layer.type === "feature") {
@@ -847,9 +848,7 @@ require([
  }
  };
  
- const NetworkCoverageFeatureLayer = new FeatureLayer({
- url: "https://services3.arcgis.com/N0l9vjYH8GLn5HZh/arcgis/rest/services/Asia_Cell_V4/FeatureServer/2",
- });
+ const NetworkCoverageFeatureLayer = map.layers.getItemAt(4)
  
  
  function getDitalls(point){
@@ -885,7 +884,7 @@ require([
  url: "https://services3.arcgis.com/N0l9vjYH8GLn5HZh/arcgis/rest/services/work_order/FeatureServer/2"
  });
  const CellPromotionsFeatureLayer = new FeatureLayer({
- url: "https://services3.arcgis.com/N0l9vjYH8GLn5HZh/arcgis/rest/services/FiberIssues_WFL1/FeatureServer/4"
+ url: "https://services3.arcgis.com/N0l9vjYH8GLn5HZh/arcgis/rest/services/Cell_Promotions/FeatureServer/2"
  });
  
  // Define the query parameters
@@ -1303,7 +1302,7 @@ require([
            <div class="accordion-item">
            <h2 class="accordion-header" id="headingCellPromotions">
              <button class="accordion-button collapsed fw-bold text-success" type="button" data-bs-toggle="collapse" data-bs-target="#collapseCellPromotions" aria-expanded="false" aria-controls="collapseCellPromotions">
-             Work Order Data
+             Promotions Data
              </button>
            </h2>
            <div id="collapseCellPromotions" class="accordion-collapse collapse" aria-labelledby="headingCellPromotions" data-bs-parent="#accordionExample">
@@ -1792,10 +1791,10 @@ require([
  
  // ===========================================================tables========================================
  
- const featureLayerTwors = map.layers.getItemAt(5); // Grabs the first layer in the map
- const featureLayerHPSMTickets = map.layers.getItemAt(6); // Grabs the first layer in the map
- const featureLayerCells = map.layers.getItemAt(4); // Grabs the first layer in the map
- const featureLayerJammerSites = map.layers.getItemAt(7);
+ const featureLayerTwors = map.layers.getItemAt(7); // Grabs the first layer in the map
+ const featureLayerHPSMTickets = map.layers.getItemAt(8); // Grabs the first layer in the map
+ const featureLayerCells = map.layers.getItemAt(6); // Grabs the first layer in the map
+ const featureLayerJammerSites = map.layers.getItemAt(9);
  const featureLayerMaintenanceSiteOperation = new FeatureLayer({
  url: "https://services3.arcgis.com/N0l9vjYH8GLn5HZh/arcgis/rest/services/Asia_Cell_V4/FeatureServer/4"
  });
@@ -1808,13 +1807,13 @@ require([
  const featureLayerInterference = new FeatureLayer({
   url: "https://services3.arcgis.com/N0l9vjYH8GLn5HZh/arcgis/rest/services/Cell_Site_Data/FeatureServer/6"
 });
- featureLayerTwors.title = "Sites";
- featureLayerHPSMTickets.title = "HPSM Tickets";
- featureLayerMaintenanceSiteOperation.title = "Maintenance Site Operation";
- featureLayerOutagesData.title = "Outages Data";
- featureLayerWorkOrderData.title = "Work Order Data";
- featureLayerWorkOrderData.title = "Work Order Data";
- featureLayerCells.title = "Cell Sites";
+//  featureLayerTwors.title = "Sites";
+//  featureLayerHPSMTickets.title = "HPSM Tickets";
+//  featureLayerMaintenanceSiteOperation.title = "Maintenance Site Operation";
+//  featureLayerOutagesData.title = "Outages Data";
+//  featureLayerWorkOrderData.title = "Work Order Data";
+//  featureLayerWorkOrderData.title = "Work Order Data";
+//  featureLayerCells.title = "Cell Sites";
  
  // Create the feature table
  const featureTableTwors = new FeatureTable({
@@ -1831,63 +1830,7 @@ require([
        zoomToSelection: true
      }
    },
-   tableTemplate: {
-     // Autocast to TableTemplate
-     columnTemplates: [
-       // Takes an array of FieldColumnTemplate and GroupColumnTemplate
-       {
-         // Autocast to FieldColumnTemplate.
-         type: "field",
-         fieldName: "site_id",
-         label: "Site ID",
-         // direction: "des"
-       },
-       {
-         type: "field",
-         fieldName: "site_name",
-         label: "Site Name"
-       },
-       // {
-       //   type: "field",
-       //   fieldName: "latitude",
-       //   label: "Latitude"
-       // },
-       // {
-       //   type: "field",
-       //   fieldName: "longitude",
-       //   label: "Longitude"
-       // },
-       {
-         type: "field",
-         fieldName: "total_no_customer",
-         label: "Total No Customer"
-       }
-       ,
-       {
-         type: "field",
-         fieldName: "site_type",
-         label: "Site type"
-       }
-       ,
-       {
-         type: "field",
-         fieldName: "maintenance",
-         label: "Maintenance"
-       }
-       ,
-       {
-         type: "field",
-         fieldName: "outages",
-         label: "Outages"
-       }
-       ,
-       {
-         type: "field",
-         fieldName: "gov",
-         label: "GOV"
-       }
-     ]
-   },
+
    container: document.getElementById("tableDiv-Towers")
  });
  // Create the feature table
@@ -1905,65 +1848,65 @@ require([
        zoomToSelection: true
      }
    },
-   tableTemplate: {
-     // Autocast to TableTemplate
-     columnTemplates: [
-       // Takes an array of FieldColumnTemplate and GroupColumnTemplate
-       {
-          // Autocast to FieldColumnTemplate.
-          type: "field",
-          fieldName: "im_id",
-          label: "TicketID",
-          // direction: "des"
-        },
-        // {
-        //   type: "field",
-        //   fieldName: "sd_open_time",
-        //   label: "SD OPEN TIME"
-        // },
-        {
-          type: "field",
-          fieldName: "sd_status",
-          label: "Status"
-        }
-        ,
-        {
-          type: "field",
-          fieldName: "im_open_time",
-          label: "Open Date Time"
-        }
-        ,
-        {
-          type: "field",
-          fieldName: "sd_resolution_time",
-          label: "Resolve Data Time"
-        }
-        ,
-        {
-          type: "field",
-          fieldName: "siteid",
-          label: "SiteID"
-        }
-        ,
-        {
-          type: "field",
-          fieldName: "MainCategory",
-          label: "MainCategory"
-        }
-        ,
-        {
-          type: "field",
-          fieldName: "Subcategory",
-          label: "Subcategory"
-        }
-        ,
-        {
-          type: "field",
-          fieldName: "Severity",
-          label: "Severity"
-        }
-     ]
-   },
+  //  tableTemplate: {
+  //    // Autocast to TableTemplate
+  //    columnTemplates: [
+  //      // Takes an array of FieldColumnTemplate and GroupColumnTemplate
+  //      {
+  //         // Autocast to FieldColumnTemplate.
+  //         type: "field",
+  //         fieldName: "im_id",
+  //         label: "TicketID",
+  //         // direction: "des"
+  //       },
+  //       // {
+  //       //   type: "field",
+  //       //   fieldName: "sd_open_time",
+  //       //   label: "SD OPEN TIME"
+  //       // },
+  //       {
+  //         type: "field",
+  //         fieldName: "sd_status",
+  //         label: "Status"
+  //       }
+  //       ,
+  //       {
+  //         type: "field",
+  //         fieldName: "im_open_time",
+  //         label: "Open Date Time"
+  //       }
+  //       ,
+  //       {
+  //         type: "field",
+  //         fieldName: "sd_resolution_time",
+  //         label: "Resolve Data Time"
+  //       }
+  //       ,
+  //       {
+  //         type: "field",
+  //         fieldName: "siteid",
+  //         label: "SiteID"
+  //       }
+  //       ,
+  //       {
+  //         type: "field",
+  //         fieldName: "MainCategory",
+  //         label: "MainCategory"
+  //       }
+  //       ,
+  //       {
+  //         type: "field",
+  //         fieldName: "Subcategory",
+  //         label: "Subcategory"
+  //       }
+  //       ,
+  //       {
+  //         type: "field",
+  //         fieldName: "Severity",
+  //         label: "Severity"
+  //       }
+  //    ]
+  //  },
    container: document.getElementById("tableDiv-HPSMTickets")
  });
  const featureTableMaintenanceSiteOperation = new FeatureTable({
@@ -1980,51 +1923,51 @@ require([
        zoomToSelection: true
      }
    },
-   tableTemplate: {
-     // Autocast to TableTemplate
-     columnTemplates: [
-       // Takes an array of FieldColumnTemplate and GroupColumnTemplate
-       {
-         // Autocast to FieldColumnTemplate.
-         type: "field",
-         fieldName: "operation_id",
-         label: "Operation ID",
-         // direction: "des"
-       },
-       {
-         type: "field",
-         fieldName: "operation_name",
-         label: "Operation Name"
-       },
-       {
-         type: "field",
-         fieldName: "operation_category",
-         label: "Operation Category"
-       },
-       {
-         type: "field",
-         fieldName: "peration_date",
-         label: "Peration Date"
-       },
-       {
-         type: "field",
-         fieldName: "site_id",
-         label: "Site ID"
-       }
-       ,
-       {
-         type: "field",
-         fieldName: "status",
-         label: "Status"
-       }
-       ,
-       {
-         type: "field",
-         fieldName: "cell_id",
-         label: "Cell ID"
-       }
-     ]
-   },
+  //  tableTemplate: {
+  //    // Autocast to TableTemplate
+  //    columnTemplates: [
+  //      // Takes an array of FieldColumnTemplate and GroupColumnTemplate
+  //      {
+  //        // Autocast to FieldColumnTemplate.
+  //        type: "field",
+  //        fieldName: "operation_id",
+  //        label: "Operation ID",
+  //        // direction: "des"
+  //      },
+  //      {
+  //        type: "field",
+  //        fieldName: "operation_name",
+  //        label: "Operation Name"
+  //      },
+  //      {
+  //        type: "field",
+  //        fieldName: "operation_category",
+  //        label: "Operation Category"
+  //      },
+  //      {
+  //        type: "field",
+  //        fieldName: "peration_date",
+  //        label: "Peration Date"
+  //      },
+  //      {
+  //        type: "field",
+  //        fieldName: "site_id",
+  //        label: "Site ID"
+  //      }
+  //      ,
+  //      {
+  //        type: "field",
+  //        fieldName: "status",
+  //        label: "Status"
+  //      }
+  //      ,
+  //      {
+  //        type: "field",
+  //        fieldName: "cell_id",
+  //        label: "Cell ID"
+  //      }
+  //    ]
+  //  },
    container: document.getElementById("tableDiv-MaintenanceSiteOperation")
  });
  const featureTableOutagesData = new FeatureTable({
@@ -2041,171 +1984,171 @@ require([
        zoomToSelection: true
      }
    },
-   tableTemplate: {
-     // Autocast to TableTemplate
-     columnTemplates: [
-       // Takes an array of FieldColumnTemplate and GroupColumnTemplate
-       {
-         // Autocast to FieldColumnTemplate.
-         type: "field",
-         fieldName: "incident_id",
-         label: "Incident ID",
-         // direction: "des"
-       },
-       {
-         type: "field",
-         fieldName: "status",
-         label: "Status"
-       },
-       {
-         type: "field",
-         fieldName: "kpi_category",
-         label: "KPI category"
-       },
-       {
-         type: "field",
-         fieldName: "kpi_subcategory",
-         label: "KPI Subcategory"
-       },
-       {
-         type: "field",
-         fieldName: "assignment",
-         label: "Assignment"
-       }
-       ,
-       {
-         type: "field",
-         fieldName: "cluster",
-         label: "Cluster"
-       }
-       ,
-       {
-         type: "field",
-         fieldName: "element",
-         label: "Element"
-       }
-       ,
-       {
-         type: "field",
-         fieldName: "province_city",
-         label: "Province City"
-       }
-       ,
-       {
-         type: "field",
-         fieldName: "ne_name",
-         label: "NE name"
-       }
-       ,
-       {
-         type: "field",
-         fieldName: "affectedobject",
-         label: "Affectedobject"
-       }
-       ,
-       {
-         type: "field",
-         fieldName: "site_id",
-         label: "Site ID"
-       }
-       ,
-       {
-         type: "field",
-         fieldName: "site_name",
-         label: "Site Name"
-       }
-       ,
-       {
-         type: "field",
-         fieldName: "original_event_time",
-         label: "Original Event Time"
-       }
-       ,
-       {
-         type: "field",
-         fieldName: "clearance_time",
-         label: "Clearance Time"
-       }
-       ,
-       {
-         type: "field",
-         fieldName: "close_time",
-         label: "Close Time"
-       }
-       ,
-       {
-         type: "field",
-         fieldName: "duration",
-         label: "Duration"
-       }
-       ,
-       {
-         type: "field",
-         fieldName: "open_time",
-         label: "Open Time"
-       }
-       ,
-       {
-         type: "field",
-         fieldName: "alarm_number",
-         label: "Alarm Number"
-       }
-       ,
-       {
-         type: "field",
-         fieldName: "alarm_severity",
-         label: "Alarm Severity"
-       }
-       ,
-       {
-         type: "field",
-         fieldName: "affected_sector",
-         label: "Affected Sector"
-       }
-       ,
-       {
-         type: "field",
-         fieldName: "problem_category",
-         label: "Problem Category"
-       }
-       ,
-       {
-         type: "field",
-         fieldName: "reason",
-         label: "Reason"
-       }
-       ,
-       {
-         type: "field",
-         fieldName: "service_affected",
-         label: "Service Affected"
-       }
-       ,
-       {
-         type: "field",
-         fieldName: "resolution_code",
-         label: "Resolution Code"
-       }
-       ,
-       {
-         type: "field",
-         fieldName: "notification_id",
-         label: "Notification ID"
-       }
-       ,
-       {
-         type: "field",
-         fieldName: "resolution",
-         label: "Resolution"
-       }
-       ,
-       {
-         type: "field",
-         fieldName: "update_time",
-         label: "Update Time"
-       }
-     ]
-   },
+  //  tableTemplate: {
+  //    // Autocast to TableTemplate
+  //    columnTemplates: [
+  //      // Takes an array of FieldColumnTemplate and GroupColumnTemplate
+  //      {
+  //        // Autocast to FieldColumnTemplate.
+  //        type: "field",
+  //        fieldName: "incident_id",
+  //        label: "Incident ID",
+  //        // direction: "des"
+  //      },
+  //      {
+  //        type: "field",
+  //        fieldName: "status",
+  //        label: "Status"
+  //      },
+  //      {
+  //        type: "field",
+  //        fieldName: "kpi_category",
+  //        label: "KPI category"
+  //      },
+  //      {
+  //        type: "field",
+  //        fieldName: "kpi_subcategory",
+  //        label: "KPI Subcategory"
+  //      },
+  //      {
+  //        type: "field",
+  //        fieldName: "assignment",
+  //        label: "Assignment"
+  //      }
+  //      ,
+  //      {
+  //        type: "field",
+  //        fieldName: "cluster",
+  //        label: "Cluster"
+  //      }
+  //      ,
+  //      {
+  //        type: "field",
+  //        fieldName: "element",
+  //        label: "Element"
+  //      }
+  //      ,
+  //      {
+  //        type: "field",
+  //        fieldName: "province_city",
+  //        label: "Province City"
+  //      }
+  //      ,
+  //      {
+  //        type: "field",
+  //        fieldName: "ne_name",
+  //        label: "NE name"
+  //      }
+  //      ,
+  //      {
+  //        type: "field",
+  //        fieldName: "affectedobject",
+  //        label: "Affectedobject"
+  //      }
+  //      ,
+  //      {
+  //        type: "field",
+  //        fieldName: "site_id",
+  //        label: "Site ID"
+  //      }
+  //      ,
+  //      {
+  //        type: "field",
+  //        fieldName: "site_name",
+  //        label: "Site Name"
+  //      }
+  //      ,
+  //      {
+  //        type: "field",
+  //        fieldName: "original_event_time",
+  //        label: "Original Event Time"
+  //      }
+  //      ,
+  //      {
+  //        type: "field",
+  //        fieldName: "clearance_time",
+  //        label: "Clearance Time"
+  //      }
+  //      ,
+  //      {
+  //        type: "field",
+  //        fieldName: "close_time",
+  //        label: "Close Time"
+  //      }
+  //      ,
+  //      {
+  //        type: "field",
+  //        fieldName: "duration",
+  //        label: "Duration"
+  //      }
+  //      ,
+  //      {
+  //        type: "field",
+  //        fieldName: "open_time",
+  //        label: "Open Time"
+  //      }
+  //      ,
+  //      {
+  //        type: "field",
+  //        fieldName: "alarm_number",
+  //        label: "Alarm Number"
+  //      }
+  //      ,
+  //      {
+  //        type: "field",
+  //        fieldName: "alarm_severity",
+  //        label: "Alarm Severity"
+  //      }
+  //      ,
+  //      {
+  //        type: "field",
+  //        fieldName: "affected_sector",
+  //        label: "Affected Sector"
+  //      }
+  //      ,
+  //      {
+  //        type: "field",
+  //        fieldName: "problem_category",
+  //        label: "Problem Category"
+  //      }
+  //      ,
+  //      {
+  //        type: "field",
+  //        fieldName: "reason",
+  //        label: "Reason"
+  //      }
+  //      ,
+  //      {
+  //        type: "field",
+  //        fieldName: "service_affected",
+  //        label: "Service Affected"
+  //      }
+  //      ,
+  //      {
+  //        type: "field",
+  //        fieldName: "resolution_code",
+  //        label: "Resolution Code"
+  //      }
+  //      ,
+  //      {
+  //        type: "field",
+  //        fieldName: "notification_id",
+  //        label: "Notification ID"
+  //      }
+  //      ,
+  //      {
+  //        type: "field",
+  //        fieldName: "resolution",
+  //        label: "Resolution"
+  //      }
+  //      ,
+  //      {
+  //        type: "field",
+  //        fieldName: "update_time",
+  //        label: "Update Time"
+  //      }
+  //    ]
+  //  },
    container: document.getElementById("tableDiv-OutagesData")
  });
  const featureTableWorkOrderData = new FeatureTable({
@@ -2222,69 +2165,69 @@ require([
        zoomToSelection: true
      }
    },
-   tableTemplate: {
-     // Autocast to TableTemplate
-     columnTemplates: [
-       // Takes an array of FieldColumnTemplate and GroupColumnTemplate
-       {
-         // Autocast to FieldColumnTemplate.
-         type: "field",
-         fieldName: "piroirty",
-         label: "Piroirty",
-         // direction: "des"
-       },
-       {
-         type: "field",
-         fieldName: "work_order_id",
-         label: "Work Order ID"
-       },
-       {
-         type: "field",
-         fieldName: "outages_id",
-         label: "Outages ID"
-       },
-       {
-         type: "field",
-         fieldName: "maintenance_id",
-         label: "Maintenance ID"
-       },
-       {
-         type: "field",
-         fieldName: "description",
-         label: "Description"
-       }
-       ,
-       {
-         type: "field",
-         fieldName: "Assignment_type",
-         label: "Assignment type"
-       }
-       ,
-       {
-         type: "field",
-         fieldName: "due_date",
-         label: "Due Date"
-       }
-       ,
-       {
-         type: "field",
-         fieldName: "in_progress_date",
-         label: "In Progress Date"
-       }
-       ,
-       {
-         type: "field",
-         fieldName: "completed_date",
-         label: "Completed Date"
-       }
-       ,
-       {
-         type: "field",
-         fieldName: "cell_id",
-         label: "Cell ID"
-       }
-     ]
-   },
+  //  tableTemplate: {
+  //    // Autocast to TableTemplate
+  //    columnTemplates: [
+  //      // Takes an array of FieldColumnTemplate and GroupColumnTemplate
+  //      {
+  //        // Autocast to FieldColumnTemplate.
+  //        type: "field",
+  //        fieldName: "piroirty",
+  //        label: "Piroirty",
+  //        // direction: "des"
+  //      },
+  //      {
+  //        type: "field",
+  //        fieldName: "work_order_id",
+  //        label: "Work Order ID"
+  //      },
+  //      {
+  //        type: "field",
+  //        fieldName: "outages_id",
+  //        label: "Outages ID"
+  //      },
+  //      {
+  //        type: "field",
+  //        fieldName: "maintenance_id",
+  //        label: "Maintenance ID"
+  //      },
+  //      {
+  //        type: "field",
+  //        fieldName: "description",
+  //        label: "Description"
+  //      }
+  //      ,
+  //      {
+  //        type: "field",
+  //        fieldName: "Assignment_type",
+  //        label: "Assignment type"
+  //      }
+  //      ,
+  //      {
+  //        type: "field",
+  //        fieldName: "due_date",
+  //        label: "Due Date"
+  //      }
+  //      ,
+  //      {
+  //        type: "field",
+  //        fieldName: "in_progress_date",
+  //        label: "In Progress Date"
+  //      }
+  //      ,
+  //      {
+  //        type: "field",
+  //        fieldName: "completed_date",
+  //        label: "Completed Date"
+  //      }
+  //      ,
+  //      {
+  //        type: "field",
+  //        fieldName: "cell_id",
+  //        label: "Cell ID"
+  //      }
+  //    ]
+  //  },
    container: document.getElementById("tableDiv-work-order")
  });
  const featureTableCells = new FeatureTable({
@@ -2301,87 +2244,87 @@ require([
        zoomToSelection: true
      }
    },
-   tableTemplate: {
-     // Autocast to TableTemplate
-     columnTemplates: [
-       // Takes an array of FieldColumnTemplate and GroupColumnTemplate
-       {
-         // Autocast to FieldColumnTemplate.
-         type: "field",
-         fieldName: "site_id",
-         label: "Site ID",
-         // direction: "des"
-       },
-       {
-         type: "field",
-         fieldName: "site_name",
-         label: "Site Name"
-       },
-       {
-         type: "field",
-         fieldName: "total_no_customer",
-         label: "Total No Customer"
-       },
-       {
-         type: "field",
-         fieldName: "site_type",
-         label: "Site Type"
-       },
-       {
-         type: "field",
-         fieldName: "covergae_area_id",
-         label: "Covergae Area ID"
-       }
-       ,
-       {
-         type: "field",
-         fieldName: "coverage_status",
-         label: "Coverage Status"
-       }
-       ,
-       {
-         type: "field",
-         fieldName: "coverage_status_date_time",
-         label: "Coverage Status Date Time"
-       }
-       ,
-       {
-         type: "field",
-         fieldName: "coverage_location",
-         label: "Coverage Location"
-       }
-       ,
-       {
-         type: "field",
-         fieldName: "cgi",
-         label: "CGI"
-       }
-       ,
-       {
-         type: "field",
-         fieldName: "outage",
-         label: "Outage"
-       }
-       ,
-       {
-         type: "field",
-         fieldName: "maintentance",
-         label: "Maintentance"
-       }
-       ,
-       {
-         type: "field",
-         fieldName: "network_type",
-         label: "Network Type"
-       }
-       ,
-       {
-         type: "field",
-         fieldName: "gov",
-         label: "GOV"
-       }
-     ]
-   },
+  //  tableTemplate: {
+  //    // Autocast to TableTemplate
+  //    columnTemplates: [
+  //      // Takes an array of FieldColumnTemplate and GroupColumnTemplate
+  //      {
+  //        // Autocast to FieldColumnTemplate.
+  //        type: "field",
+  //        fieldName: "site_id",
+  //        label: "Site ID",
+  //        // direction: "des"
+  //      },
+  //      {
+  //        type: "field",
+  //        fieldName: "site_name",
+  //        label: "Site Name"
+  //      },
+  //      {
+  //        type: "field",
+  //        fieldName: "total_no_customer",
+  //        label: "Total No Customer"
+  //      },
+  //      {
+  //        type: "field",
+  //        fieldName: "site_type",
+  //        label: "Site Type"
+  //      },
+  //      {
+  //        type: "field",
+  //        fieldName: "covergae_area_id",
+  //        label: "Covergae Area ID"
+  //      }
+  //      ,
+  //      {
+  //        type: "field",
+  //        fieldName: "coverage_status",
+  //        label: "Coverage Status"
+  //      }
+  //      ,
+  //      {
+  //        type: "field",
+  //        fieldName: "coverage_status_date_time",
+  //        label: "Coverage Status Date Time"
+  //      }
+  //      ,
+  //      {
+  //        type: "field",
+  //        fieldName: "coverage_location",
+  //        label: "Coverage Location"
+  //      }
+  //      ,
+  //      {
+  //        type: "field",
+  //        fieldName: "cgi",
+  //        label: "CGI"
+  //      }
+  //      ,
+  //      {
+  //        type: "field",
+  //        fieldName: "outage",
+  //        label: "Outage"
+  //      }
+  //      ,
+  //      {
+  //        type: "field",
+  //        fieldName: "maintentance",
+  //        label: "Maintentance"
+  //      }
+  //      ,
+  //      {
+  //        type: "field",
+  //        fieldName: "network_type",
+  //        label: "Network Type"
+  //      }
+  //      ,
+  //      {
+  //        type: "field",
+  //        fieldName: "gov",
+  //        label: "GOV"
+  //      }
+  //    ]
+  //  },
    container: document.getElementById("tableDiv-Cells")
  });
  const featureTableJammerSites = new FeatureTable({
@@ -2398,38 +2341,38 @@ require([
       zoomToSelection: true
     }
   },
-  tableTemplate: {
-    // Autocast to TableTemplate
-    columnTemplates: [
-      // Takes an array of FieldColumnTemplate and GroupColumnTemplate
-      {
-        // Autocast to FieldColumnTemplate.
-        type: "field",
-        fieldName: "Site_ID",
-        label: "Site ID",
+  // tableTemplate: {
+  //   // Autocast to TableTemplate
+  //   columnTemplates: [
+  //     // Takes an array of FieldColumnTemplate and GroupColumnTemplate
+  //     {
+  //       // Autocast to FieldColumnTemplate.
+  //       type: "field",
+  //       fieldName: "Site_ID",
+  //       label: "Site ID",
        
-      }
-      ,
-      {
-        type: "field",
-        fieldName: "Full_Site_Name",
-        label: "Full Site Name"
-      }
-      ,
-      {
-        type: "field",
-        fieldName: "Longitude",
-        label: "Longitude"
-      }
-      ,
-      {
-        type: "field",
-        fieldName: "Latitude",
-        label: "Latitude"
-      }
+  //     }
+  //     ,
+  //     {
+  //       type: "field",
+  //       fieldName: "Full_Site_Name",
+  //       label: "Full Site Name"
+  //     }
+  //     ,
+  //     {
+  //       type: "field",
+  //       fieldName: "Longitude",
+  //       label: "Longitude"
+  //     }
+  //     ,
+  //     {
+  //       type: "field",
+  //       fieldName: "Latitude",
+  //       label: "Latitude"
+  //     }
 
-    ]
-  },
+  //   ]
+  // },
   container: document.getElementById("tableDiv-JammerSites")
 });
 const featureTableInterference = new FeatureTable({
@@ -2446,62 +2389,62 @@ const featureTableInterference = new FeatureTable({
       zoomToSelection: true
     }
   },
-  tableTemplate: {
-    // Autocast to TableTemplate
-    columnTemplates: [
-      // Takes an array of FieldColumnTemplate and GroupColumnTemplate
-      {
-        // Autocast to FieldColumnTemplate.
-        type: "field",
-        fieldName: "Date",
-        label: "Date",
+  // tableTemplate: {
+  //   // Autocast to TableTemplate
+  //   columnTemplates: [
+  //     // Takes an array of FieldColumnTemplate and GroupColumnTemplate
+  //     {
+  //       // Autocast to FieldColumnTemplate.
+  //       type: "field",
+  //       fieldName: "Date",
+  //       label: "Date",
        
-      }
-      ,
-      {
-        type: "field",
-        fieldName: "Cell_FDD_TDD_Indication",
-        label: "Cell FDD TDD Indication"
-      }
-      ,
-      {
-        type: "field",
-        fieldName: "eNodeB_Name",
-        label: "eNodeB Name"
-      }
-      ,
-      {
-        type: "field",
-        fieldName: "Cell_Name",
-        label: "Cell Name"
-      }
-      ,
-      {
-        type: "field",
-        fieldName: "eNodeB_Function_Name",
-        label: "eNodeB Function Name"
-      }
-      ,
-      {
-        type: "field",
-        fieldName: "LocalCell_Id",
-        label: "LocalCell ID"
-      }
-      ,
-      {
-        type: "field",
-        fieldName: "Integrity",
-        label: "Integrity"
-      }
-      ,
-      {
-        type: "field",
-        fieldName: "LULInterferenceAvg_dBm_",
-        label: "LULInterferenceAvg dBm"
-      }
+  //     }
+  //     ,
+  //     {
+  //       type: "field",
+  //       fieldName: "Cell_FDD_TDD_Indication",
+  //       label: "Cell FDD TDD Indication"
+  //     }
+  //     ,
+  //     {
+  //       type: "field",
+  //       fieldName: "eNodeB_Name",
+  //       label: "eNodeB Name"
+  //     }
+  //     ,
+  //     {
+  //       type: "field",
+  //       fieldName: "Cell_Name",
+  //       label: "Cell Name"
+  //     }
+  //     ,
+  //     {
+  //       type: "field",
+  //       fieldName: "eNodeB_Function_Name",
+  //       label: "eNodeB Function Name"
+  //     }
+  //     ,
+  //     {
+  //       type: "field",
+  //       fieldName: "LocalCell_Id",
+  //       label: "LocalCell ID"
+  //     }
+  //     ,
+  //     {
+  //       type: "field",
+  //       fieldName: "Integrity",
+  //       label: "Integrity"
+  //     }
+  //     ,
+  //     {
+  //       type: "field",
+  //       fieldName: "LULInterferenceAvg_dBm_",
+  //       label: "LULInterferenceAvg dBm"
+  //     }
 
-    ]
-  },
+  //   ]
+  // },
   container: document.getElementById("tableDiv-Interference")
 });
 
@@ -2555,6 +2498,18 @@ const featureTableInterference = new FeatureTable({
         result.graphic.layer === featureLayerJammerSites
 
     }
+     else if (result.graphic.layer === featureLayerCells) {
+      return result.graphic &&
+        result.graphic.layer &&
+        result.graphic.layer === featureLayerCells
+
+    }
+     else if (result.graphic.layer === map.layers.getItemAt(10)){
+      return result.graphic &&
+      result.graphic.layer &&
+        result.graphic.layer === map.layers.getItemAt(10) 
+  
+     }
      else if (result.graphic.layer === map.layers.getItemAt(4)){
       return result.graphic &&
       result.graphic.layer &&
@@ -2592,7 +2547,7 @@ const featureTableInterference = new FeatureTable({
    if (candidate) {
     console.log("candidate.graphic : " , candidate.layer.title);
      const objectId = candidate.graphic.getObjectId();
-    if(candidate.layer.title == "Sites"){
+    if(candidate.layer.title == "sitesfinal"){
 
       if (featureTableTwors.highlightIds.includes(objectId)) {
         // Remove feature from current selection if feature
@@ -2603,7 +2558,7 @@ const featureTableInterference = new FeatureTable({
         // Add this feature to the featureTableTwors highlightIds collection
       }
     }
-    else if(candidate.layer.title == "HPSM Tickets"){
+    else if(candidate.layer.title == "HPSM_Tickets"){
 
       
           if (featureTableHPSMTickets.highlightIds.includes(objectId)) {
@@ -2615,7 +2570,7 @@ const featureTableInterference = new FeatureTable({
             featureTableHPSMTickets.highlightIds.add(objectId);
           }
     }
-    else if(candidate.layer.title == "Cell Sites"){
+    else if(candidate.layer.title == "Cell"){
 
       
           if (featureTableCells.highlightIds.includes(objectId)) {
@@ -2658,6 +2613,24 @@ const featureTableInterference = new FeatureTable({
       }
     }
     else if(candidate.layer.title == "Network Area"){
+      if (candidate.graphic.layer.type === "feature") {
+        layerViews.forEach((layerView) => {
+          if (candidate.graphic.layer.title === layerView.layer.title) {
+            handles.add(layerView.highlight(candidate.graphic));
+          }
+        });
+      }
+    }
+    else if(candidate.layer.title == "CCTickets_RFI - CCTicketsFC_ExportFeatures"){
+      if (candidate.graphic.layer.type === "feature") {
+        layerViews.forEach((layerView) => {
+          if (candidate.graphic.layer.title === layerView.layer.title) {
+            handles.add(layerView.highlight(candidate.graphic));
+          }
+        });
+      }
+    }
+    else if(candidate.layer.title == "Cell Sites"){
       if (candidate.graphic.layer.type === "feature") {
         layerViews.forEach((layerView) => {
           if (candidate.graphic.layer.title === layerView.layer.title) {
