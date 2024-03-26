@@ -1,6 +1,0 @@
-{
-  "dependencies": {
-    "@arcgis/core": "^4.29.7",
-    "dojox": "^1.17.3"
-  }
-}
